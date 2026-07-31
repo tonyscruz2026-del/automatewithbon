@@ -1,30 +1,64 @@
-import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/postprocessing/EffectComposer.js";
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
-import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/postprocessing/RenderPass.js";
+import { EffectComposer } from "https://unpkg.com/three@0.170.0/examples/jsm/postprocessing/EffectComposer.js";
 
-import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { RenderPass } from "https://unpkg.com/three@0.170.0/examples/jsm/postprocessing/RenderPass.js";
 
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js";
+import { UnrealBloomPass } from "https://unpkg.com/three@0.170.0/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 export function createEffects(renderer, scene, camera) {
 
+    // ======================================
+    // Composer
+    // ======================================
+
     const composer = new EffectComposer(renderer);
 
-    composer.addPass(
-        new RenderPass(scene, camera)
+    // ======================================
+    // Main Render Pass
+    // ======================================
+
+    const renderPass = new RenderPass(
+        scene,
+        camera
     );
 
-    const bloom = new UnrealBloomPass(
+    composer.addPass(renderPass);
+
+    // ======================================
+    // Bloom Pass
+    // ======================================
+
+    const bloomPass = new UnrealBloomPass(
+
         new THREE.Vector2(
+
             window.innerWidth,
+
             window.innerHeight
+
         ),
-        0.6,
-        0.4,
-        0.85
+
+        1.6,    // Strength
+
+        0.45,   // Radius
+
+        0.12    // Threshold
+
     );
 
-    composer.addPass(bloom);
+    composer.addPass(bloomPass);
+
+    // ======================================
+    // Store for Future Updates
+    // ======================================
+
+    composer.userData = {
+
+        bloomPass
+
+    };
 
     return composer;
+
 }
