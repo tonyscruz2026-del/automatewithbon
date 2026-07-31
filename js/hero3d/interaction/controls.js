@@ -1,37 +1,37 @@
-import { OrbitControls } from "https://unpkg.com/three@0.170.0/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls }
+from "three/addons/controls/OrbitControls.js";
 
-export function createControls(camera, renderer) {
+export function createControls(
 
-    const controls = new OrbitControls(
-        camera,
-        renderer.domElement
-    );
+    camera,
 
-    // Smooth movement
+    renderer
+
+){
+
+    const controls =
+        new OrbitControls(
+
+            camera,
+
+            renderer.domElement
+
+        );
+
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
 
-    // Allow rotation
-    controls.enableRotate = true;
-
-    // Allow zoom
-    controls.enableZoom = true;
-
-    // Disable panning
     controls.enablePan = false;
 
-    // Zoom limits
+    controls.enableZoom = true;
+
+    controls.autoRotate = false;
+
     controls.minDistance = 4;
-    controls.maxDistance = 14;
 
-    // Rotate around the center sphere
-    controls.target.set(0, 0, 0);
+    controls.maxDistance = 12;
 
-    // Optional limits
-    controls.minPolarAngle = Math.PI * 0.2;
     controls.maxPolarAngle = Math.PI * 0.8;
 
-    controls.update();
-
     return controls;
+
 }
