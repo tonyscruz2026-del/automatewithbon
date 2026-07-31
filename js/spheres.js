@@ -1,89 +1,148 @@
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
 import {
-
-createGlassMaterial,
-
-createCoreMaterial
-
+    createGlassMaterial,
+    createCoreMaterial
 } from "./materials.js";
 
-export function createSpheres(scene){
+export function createSpheres(scene) {
 
-const geometry=new THREE.SphereGeometry(
+    // =====================================
+    // Geometry
+    // =====================================
 
-0.55,
+    const geometry = new THREE.SphereGeometry(
+        0.55,
+        64,
+        64
+    );
 
-64,
+    // =====================================
+    // Sphere Positions
+    // =====================================
 
-64
+    const positions = [
 
-);
+        // Center AI Core
+        [0, 0, 0],
 
-const positions=[
+        // Top Left
+        [-2.2, 1.2, 0],
 
-[0,0,0],
+        // Top Right
+        [2.2, 1.2, 0],
 
-[-2.2,1.2,0],
+        // Bottom Left
+        [-1.8, -1.5, 0],
 
-[2.2,1.2,0],
+        // Bottom Right
+        [1.8, -1.5, 0]
 
-[-1.8,-1.5,0],
+    ];
 
-[1.8,-1.5,0]
+    const spheres = [];
 
-];
+    positions.forEach((position, index) => {
 
-const spheres=[];
+        // ============================
+        // Choose Material
+        // ============================
 
-positions.forEach((position,index)=>{
+        const material = index === 0
+            ? createCoreMaterial()
+            : createGlassMaterial();
 
-const material=
+        // ============================
+        // Create Sphere
+        // ============================
 
-index===0
+        const sphere = new THREE.Mesh(
+            geometry,
+            material
+        );
 
-?createCoreMaterial()
+        sphere.position.set(
+            position[0],
+            position[1],
+            position[2]
+        );
 
-:createGlassMaterial();
+        // ============================
+        // Scale
+        // ============================
 
-const sphere=new THREE.Mesh(
+        if (index === 0) {
 
-geometry,
+            // Larger AI Core
+            sphere.scale.setScalar(1.7);
 
-material
+        } else {
 
-);
+            sphere.scale.setScalar(1);
 
-sphere.position.set(
+        }
 
-...position
+        // ============================
+        // Store Original Position
+        // ============================
 
-);
+        sphere.userData = {
 
-if(index===0){
+            index,
 
-sphere.scale.setScalar(1.7);
+            baseX: position[0],
 
-}else{
+            baseY: position[1],
 
-sphere.scale.setScalar(1);
+            baseZ: position[2]
 
-}
+        };
 
-sphere.userData.baseX=position[0];
+        // ============================
+        // AI Core Glow
+        // ============================
 
-sphere.userData.baseY=position[1];
+        if (index === 0) {
 
-sphere.userData.baseZ=position[2];
+            const glowGeometry = new THREE.SphereGeometry(
+                0.9,
+                64,
+                64
+            );
 
-sphere.userData.index=index;
+            const glowMaterial = new THREE.MeshBasicMaterial({
 
-scene.add(sphere);
+                color: 0x00bfff,
 
-spheres.push(sphere);
+                transparent: true,
 
-});
+                opacity: 0.12,
 
-return spheres;
+                side: THREE.DoubleSide
+
+            });
+
+            const glow = new THREE.Mesh(
+                glowGeometry,
+                glowMaterial
+            );
+
+            sphere.add(glow);
+
+            sphere.userData.glow = glow;
+
+        }
+
+        // ============================
+        // Add to Scene
+        // ============================
+
+        scene.add(sphere);
+
+        spheres.push(sphere);
+
+    });
+
+    return spheres;
 
 }
