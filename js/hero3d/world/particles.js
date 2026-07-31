@@ -1,44 +1,89 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js";
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
 export function createParticles(scene) {
 
-    const geometry = new THREE.BufferGeometry();
+    // =====================================
+    // Settings
+    // =====================================
 
-    const count = 1500;
+    const particleCount = 3500;
 
-    const positions = [];
+    const positions = new Float32Array(
+        particleCount * 3
+    );
 
-    for (let i = 0; i < count; i++) {
+    // =====================================
+    // Generate Positions
+    // =====================================
 
-        positions.push(
-            (Math.random() - 0.5) * 40,
-            (Math.random() - 0.5) * 40,
-            (Math.random() - 0.5) * 40
-        );
+    for (let i = 0; i < particleCount; i++) {
+
+        const i3 = i * 3;
+
+        positions[i3] = (Math.random() - 0.5) * 80;
+        positions[i3 + 1] = (Math.random() - 0.5) * 60;
+        positions[i3 + 2] = (Math.random() - 0.5) * 80;
 
     }
 
+    // =====================================
+    // Geometry
+    // =====================================
+
+    const geometry = new THREE.BufferGeometry();
+
     geometry.setAttribute(
+
         "position",
-        new THREE.Float32BufferAttribute(
+
+        new THREE.BufferAttribute(
+
             positions,
+
             3
+
         )
+
     );
+
+    // =====================================
+    // Material
+    // =====================================
 
     const material = new THREE.PointsMaterial({
 
         color: 0x66ccff,
-        size: 0.05
+
+        size: 0.05,
+
+        transparent: true,
+
+        opacity: 0.85,
+
+        depthWrite: false,
+
+        blending: THREE.AdditiveBlending,
+
+        sizeAttenuation: true
 
     });
 
-    const stars = new THREE.Points(
+    // =====================================
+    // Particle System
+    // =====================================
+
+    const particles = new THREE.Points(
+
         geometry,
+
         material
+
     );
 
-    scene.add(stars);
+    particles.rotation.order = "YXZ";
 
-    return stars;
+    scene.add(particles);
+
+    return particles;
+
 }
