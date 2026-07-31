@@ -1,4 +1,4 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
 export function createRenderer(canvas) {
 
@@ -6,9 +6,9 @@ export function createRenderer(canvas) {
 
         canvas,
 
-        alpha: true,
-
         antialias: true,
+
+        alpha: true,
 
         powerPreference: "high-performance"
 
@@ -28,15 +28,15 @@ export function createRenderer(canvas) {
 
     );
 
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
 
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping =
+        THREE.ACESFilmicToneMapping;
 
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.1;
 
     renderer.shadowMap.enabled = true;
-
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     return renderer;
 
