@@ -4,69 +4,139 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>NexOps</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NexOps | AI Automation</title>
+
+    <meta
+        name="description"
+        content="AI Automation Solutions for Modern Businesses."
+    >
 
     <!-- CSS -->
-    <link rel="stylesheet" href="./css/hero3d.css">
+
+    <link
+        rel="stylesheet"
+        href="./css/hero3d.css"
+    >
 
 </head>
 
 <body>
 
-<header class="hero">
+    <!-- ======================================
+         HERO
+    ======================================= -->
 
-    <!-- Three.js Canvas -->
-    <canvas id="heroCanvas"></canvas>
+    <header class="hero">
 
-    <!-- Hero Overlay -->
-    <div class="hero-content">
+        <!-- Three.js Canvas -->
 
-        <span class="eyebrow">
-            AI AUTOMATION
-        </span>
+        <canvas id="heroCanvas"></canvas>
 
-        <h1>
-            Automate Your Business
-            <span>Like a Pro</span>
-        </h1>
+        <!-- Dark Overlay -->
 
-        <p>
-            Intelligent AI systems that automate operations,
-            qualify leads,
-            manage reviews,
-            and grow your business.
-        </p>
+        <div class="hero-overlay"></div>
 
-        <div class="hero-buttons">
+        <!-- Hero Content -->
 
-            <a href="#" class="primary">
-                Book Discovery Call
-            </a>
+        <section class="hero-content">
 
-            <a href="#" class="secondary">
-                View Portfolio
-            </a>
+            <span class="eyebrow">
 
-        </div>
+                AI AUTOMATION
 
-    </div>
+            </span>
 
-</header>
+            <h1>
 
-<!-- Three.js Import Map -->
-<script type="importmap">
-{
-    "imports": {
-        "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+                Automate Your Business
+
+                <span>
+
+                    Like a Pro
+
+                </span>
+
+            </h1>
+
+            <p>
+
+                Intelligent AI systems that automate operations,
+                qualify leads,
+                manage reviews,
+                and grow your business.
+
+            </p>
+
+            <div class="hero-buttons">
+
+                <a
+                    href="#"
+                    class="primary"
+                >
+
+                    Book Discovery Call
+
+                </a>
+
+                <a
+                    href="#"
+                    class="secondary"
+                >
+
+                    View Portfolio
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </header>
+
+    <!-- ======================================
+         FUTURE PROJECT INFO PANEL
+    ======================================= -->
+
+    <aside
+        id="projectPanel"
+        class="project-panel"
+    >
+
+    </aside>
+
+    <!-- ======================================
+         IMPORT MAP
+    ======================================= -->
+
+    <script type="importmap">
+    {
+        "imports": {
+
+            "three":
+            "https://unpkg.com/three@0.170.0/build/three.module.js",
+
+            "three/addons/":
+            "https://unpkg.com/three@0.170.0/examples/jsm/"
+
+        }
     }
-}
-</script>
+    </script>
 
-<!-- JavaScript -->
-<script type="module" src="./js/hero3d/hero3d.js"></script>
+    <!-- ======================================
+         HERO V2
+    ======================================= -->
+
+    <script
+        type="module"
+        src="./js/hero3d/hero3d.js"
+    ></script>
 
 </body>
+
 </html>
