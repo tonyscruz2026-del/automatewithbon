@@ -1,39 +1,124 @@
-spheres.forEach((sphere,index)=>{
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
-sphere.position.y=
+const clock = new THREE.Clock();
 
-sphere.userData.baseY+
+export function animate({
 
-Math.sin(
+    renderer,
+    composer,
+    scene,
+    camera,
+    controls,
+    spheres,
+    particles
 
-t*1.6+
+}) {
 
-index
+    function loop() {
 
-)*0.15;
+        requestAnimationFrame(loop);
 
-sphere.rotation.y+=0.003;
+        const t = clock.getElapsedTime();
 
-sphere.rotation.x+=0.0015;
+        // =====================================
+        // AI Sphere Animation
+        // =====================================
 
-if(index===0){
+        spheres.forEach((sphere, index) => {
 
-const pulse=
+            // Floating Animation
+            sphere.position.y =
+                sphere.userData.baseY +
+                Math.sin(t * 1.5 + index) * 0.15;
 
-1+
+            // Gentle Rotation
+            sphere.rotation.y += 0.003;
+            sphere.rotation.x += 0.0015;
 
-Math.sin(
+            // ============================
+            // AI Core Animation
+            // ============================
 
-t*3
+            if (index === 0) {
 
-)*0.05;
+                // Smooth pulse
+                const pulse =
+                    1 + Math.sin(t * 3) * 0.05;
 
-sphere.scale.setScalar(
+                sphere.scale.setScalar(
+                    1.7 * pulse
+                );
 
-1.7*pulse
+                // Animate glow shell
+                if (sphere.userData.glow) {
 
-);
+                    sphere.userData.glow.scale.setScalar(
+
+                        1.05 +
+                        Math.sin(t * 3) * 0.08
+
+                    );
+
+                    sphere.userData.glow.material.opacity =
+
+                        0.08 +
+
+                        Math.sin(t * 3) * 0.05;
+
+                }
+
+                // Animate emissive intensity
+                if (sphere.material.emissiveIntensity !== undefined) {
+
+                    sphere.material.emissiveIntensity =
+
+                        2.2 +
+
+                        Math.sin(t * 3) * 0.8;
+
+                }
+
+            }
+
+        });
+
+        // =====================================
+        // Particle Animation
+        // =====================================
+
+        if (particles) {
+
+            particles.rotation.y += 0.0005;
+
+            particles.rotation.x += 0.00015;
+
+        }
+
+        // =====================================
+        // Controls
+        // =====================================
+
+        controls.update();
+
+        // =====================================
+        // Render
+        // =====================================
+
+        if (composer) {
+
+            composer.render();
+
+        } else {
+
+            renderer.render(
+                scene,
+                camera
+            );
+
+        }
+
+    }
+
+    loop();
 
 }
-
-});
