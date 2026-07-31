@@ -1,4 +1,6 @@
-import { RGBELoader } from "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/loaders/RGBELoader.js";
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+
+import { RGBELoader } from "https://unpkg.com/three@0.170.0/examples/jsm/loaders/RGBELoader.js";
 
 export async function loadEnvironment(scene) {
 
