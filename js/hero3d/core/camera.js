@@ -10,7 +10,7 @@ export function createCamera() {
 
         0.1,
 
-        100
+        200
 
     );
 
@@ -20,7 +20,7 @@ export function createCamera() {
 
         1.5,
 
-        8
+        9
 
     );
 
