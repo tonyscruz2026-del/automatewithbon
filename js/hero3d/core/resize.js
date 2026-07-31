@@ -1,42 +1,68 @@
-export function setupResize(camera, renderer, composer) {
+export function setupResize({
 
-    window.addEventListener("resize", () => {
+    camera,
 
-        // ============================
+    renderer,
+
+    composer
+
+}) {
+
+    function resize() {
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // -----------------------------
         // Camera
-        // ============================
+        // -----------------------------
 
-        camera.aspect =
-            window.innerWidth / window.innerHeight;
+        camera.aspect = width / height;
 
         camera.updateProjectionMatrix();
 
-        // ============================
+        // -----------------------------
         // Renderer
-        // ============================
+        // -----------------------------
 
         renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
+
+            width,
+
+            height
+
         );
 
         renderer.setPixelRatio(
+
             Math.min(window.devicePixelRatio, 2)
+
         );
 
-        // ============================
-        // Composer
-        // ============================
+        // -----------------------------
+        // Post Processing
+        // -----------------------------
 
         if (composer) {
 
             composer.setSize(
-                window.innerWidth,
-                window.innerHeight
+
+                width,
+
+                height
+
             );
 
         }
 
-    });
+    }
+
+    window.addEventListener(
+
+        "resize",
+
+        resize
+
+    );
 
 }
