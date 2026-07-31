@@ -6,9 +6,9 @@ export function createRenderer(canvas) {
 
         canvas,
 
-        antialias: true,
-
         alpha: true,
+
+        antialias: true,
 
         powerPreference: "high-performance"
 
@@ -24,17 +24,15 @@ export function createRenderer(canvas) {
 
     renderer.setPixelRatio(
 
-        Math.min(window.devicePixelRatio, 2)
+        Math.min(window.devicePixelRatio,2)
 
     );
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    renderer.physicallyCorrectLights = true;
-
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 1.2;
 
     renderer.shadowMap.enabled = true;
 
