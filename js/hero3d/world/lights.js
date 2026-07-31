@@ -1,34 +1,26 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
-export function createLights(scene) {
+export function createLights(scene){
 
-    // =====================================
-    // Ambient Light
-    // =====================================
-
-    const ambientLight = new THREE.AmbientLight(
+    const ambient = new THREE.AmbientLight(
 
         0xffffff,
 
-        1.8
+        2
 
     );
 
-    scene.add(ambientLight);
+    scene.add(ambient);
 
-    // =====================================
-    // Main Directional Light
-    // =====================================
+    const key = new THREE.DirectionalLight(
 
-    const directionalLight = new THREE.DirectionalLight(
+        0x7cc7ff,
 
-        0xffffff,
-
-        3
+        5
 
     );
 
-    directionalLight.position.set(
+    key.position.set(
 
         5,
 
@@ -38,110 +30,28 @@ export function createLights(scene) {
 
     );
 
-    directionalLight.castShadow = true;
+    scene.add(key);
 
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
+    const rim = new THREE.PointLight(
 
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
+        0x00bfff,
 
-    scene.add(directionalLight);
+        80,
 
-    // =====================================
-    // Blue Rim Light
-    // =====================================
-
-    const blueLight = new THREE.PointLight(
-
-        0x4da6ff,
-
-        25,
-
-        30
+        50
 
     );
 
-    blueLight.position.set(
+    rim.position.set(
 
-        -4,
+        -5,
 
         3,
 
-        5
+        -5
 
     );
 
-    scene.add(blueLight);
-
-    // =====================================
-    // Cyan Fill Light
-    // =====================================
-
-    const cyanLight = new THREE.PointLight(
-
-        0x00ffff,
-
-        12,
-
-        25
-
-    );
-
-    cyanLight.position.set(
-
-        5,
-
-        -2,
-
-        3
-
-    );
-
-    scene.add(cyanLight);
-
-    // =====================================
-    // Purple Accent Light
-    // =====================================
-
-    const purpleLight = new THREE.PointLight(
-
-        0x8b5cf6,
-
-        10,
-
-        25
-
-    );
-
-    purpleLight.position.set(
-
-        0,
-
-        4,
-
-        -4
-
-    );
-
-    scene.add(purpleLight);
-
-    // =====================================
-    // Return References
-    // =====================================
-
-    return {
-
-        ambientLight,
-
-        directionalLight,
-
-        blueLight,
-
-        cyanLight,
-
-        purpleLight
-
-    };
+    scene.add(rim);
 
 }
