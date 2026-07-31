@@ -1,56 +1,74 @@
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
+/*
+========================================
+STANDARD GLASS MATERIAL
+========================================
+*/
+
 export function createGlassMaterial(color = 0x88ccff) {
 
     return new THREE.MeshPhysicalMaterial({
 
         color,
 
-        metalness:0.15,
+        metalness: 0.15,
 
-        roughness:0.03,
+        roughness: 0.03,
 
-        transmission:1,
+        transmission: 1,
 
-        thickness:2,
+        thickness: 2,
 
-        ior:1.45,
+        ior: 1.45,
 
-        clearcoat:1,
+        clearcoat: 1,
 
-        clearcoatRoughness:0,
+        clearcoatRoughness: 0,
 
-        reflectivity:1,
+        reflectivity: 1,
 
-        transparent:true,
+        transparent: true,
 
-        opacity:1
+        opacity: 1
 
     });
 
 }
 
-export function createCoreMaterial(){
+/*
+========================================
+AI CORE MATERIAL
+========================================
+*/
+
+export function createCoreMaterial() {
 
     return new THREE.MeshPhysicalMaterial({
 
-        color:0x00bfff,
+        color: 0x00bfff,
 
-        emissive:0x00bfff,
+        emissive: 0x00bfff,
 
-        emissiveIntensity:2,
+        emissiveIntensity: 2,
 
-        transmission:0.8,
+        transmission: 0.85,
 
-        thickness:3,
+        thickness: 3,
 
-        roughness:0,
+        roughness: 0,
 
-        metalness:0.1,
+        metalness: 0.1,
 
-        clearcoat:1,
+        clearcoat: 1,
 
-        clearcoatRoughness:0
+        clearcoatRoughness: 0,
+
+        reflectivity: 1,
+
+        transparent: true,
+
+        opacity: 1
 
     });
 
