@@ -15,12 +15,11 @@ body{
     height:100%;
     overflow:hidden;
 
-    font-family:
-    "Inter",
-    sans-serif;
+    font-family:"Inter", sans-serif;
 
     background:#05070d;
     color:white;
+
 }
 
 /* ===========================
@@ -58,6 +57,14 @@ body{
     display:block;
 
     z-index:1;
+
+    cursor:grab;
+
+}
+
+#heroCanvas:active{
+
+    cursor:grabbing;
 
 }
 
@@ -108,6 +115,9 @@ body{
     text-align:center;
 
     padding:40px;
+
+    /* Allow mouse to reach the canvas */
+    pointer-events:none;
 
 }
 
@@ -187,6 +197,8 @@ body{
 
     flex-wrap:wrap;
 
+    pointer-events:auto;
+
 }
 
 .hero-buttons a{
@@ -199,9 +211,13 @@ body{
 
     transition:.35s;
 
+    pointer-events:auto;
+
 }
 
-/* Primary */
+/* ===========================
+   PRIMARY BUTTON
+=========================== */
 
 .primary{
 
@@ -223,7 +239,9 @@ body{
 
 }
 
-/* Secondary */
+/* ===========================
+   SECONDARY BUTTON
+=========================== */
 
 .secondary{
 
@@ -274,6 +292,13 @@ font-size:38px;
 .hero-content{
 
 padding:20px;
+
+}
+
+.hero-buttons{
+
+flex-direction:column;
+align-items:center;
 
 }
 
