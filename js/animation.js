@@ -1,72 +1,39 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+spheres.forEach((sphere,index)=>{
 
-const clock = new THREE.Clock();
+sphere.position.y=
 
-export function animate({
+sphere.userData.baseY+
 
-    renderer,
-    composer,
-    scene,
-    camera,
-    controls,
-    spheres,
-    particles
+Math.sin(
 
-}) {
+t*1.6+
 
-    function loop() {
+index
 
-        requestAnimationFrame(loop);
+)*0.15;
 
-        const t = clock.getElapsedTime();
+sphere.rotation.y+=0.003;
 
-        // ============================
-        // Floating Spheres
-        // ============================
+sphere.rotation.x+=0.0015;
 
-        spheres.forEach((sphere, index) => {
+if(index===0){
 
-            sphere.position.y +=
-                Math.sin(t * 1.5 + index) * 0.0025;
+const pulse=
 
-            sphere.rotation.y += 0.003;
-            sphere.rotation.x += 0.0015;
+1+
 
-        });
+Math.sin(
 
-        // ============================
-        // Rotate Particle Field
-        // ============================
+t*3
 
-        if (particles) {
+)*0.05;
 
-            particles.rotation.y += 0.0004;
-            particles.rotation.x += 0.0001;
+sphere.scale.setScalar(
 
-        }
+1.7*pulse
 
-        // ============================
-        // Update Controls
-        // ============================
-
-        controls.update();
-
-        // ============================
-        // Render
-        // ============================
-
-        if (composer) {
-
-            composer.render();
-
-        } else {
-
-            renderer.render(scene, camera);
-
-        }
-
-    }
-
-    loop();
+);
 
 }
+
+});
