@@ -1,15 +1,10 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
 export function createScene() {
 
     const scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0x050816);
-
-    scene.fog = new THREE.FogExp2(
-        0x050816,
-        0.03
-    );
+    scene.background = new THREE.Color(0x030712);
 
     return scene;
 
