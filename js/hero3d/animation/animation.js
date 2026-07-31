@@ -88,9 +88,11 @@ export function animate({
 
         if (particles) {
 
-            particles.rotation.y += 0.0005;
+            particles.rotation.y += 0.00035;
 
-            particles.rotation.x += 0.00015;
+    particles.rotation.x += 0.00008;
+
+    particles.rotation.z += 0.00012;
 
         }
 
