@@ -1,86 +1,89 @@
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { createGlassMaterial } from "./materials.js";
 
-export function createSpheres(scene) {
+import {
 
-    // ==========================
-    // Geometry
-    // ==========================
+createGlassMaterial,
 
-    const geometry = new THREE.SphereGeometry(
-        0.55,
-        64,
-        64
-    );
+createCoreMaterial
 
-    // ==========================
-    // Layout
-    // ==========================
+} from "./materials.js";
 
-    const positions = [
+export function createSpheres(scene){
 
-        [0, 0, 0],          // AI Core
+const geometry=new THREE.SphereGeometry(
 
-        [-2.2, 1.2, 0],
+0.55,
 
-        [2.2, 1.2, 0],
+64,
 
-        [-1.8, -1.5, 0],
+64
 
-        [1.8, -1.5, 0]
+);
 
-    ];
+const positions=[
 
-    // ==========================
-    // Create Spheres
-    // ==========================
+[0,0,0],
 
-    const spheres = [];
+[-2.2,1.2,0],
 
-    positions.forEach((position, index) => {
+[2.2,1.2,0],
 
-        const sphere = new THREE.Mesh(
+[-1.8,-1.5,0],
 
-            geometry,
+[1.8,-1.5,0]
 
-            createGlassMaterial()
+];
 
-        );
+const spheres=[];
 
-        sphere.position.set(
+positions.forEach((position,index)=>{
 
-            position[0],
+const material=
 
-            position[1],
+index===0
 
-            position[2]
+?createCoreMaterial()
 
-        );
+:createGlassMaterial();
 
-        // Bigger center sphere
+const sphere=new THREE.Mesh(
 
-        if (index === 0) {
+geometry,
 
-            sphere.scale.setScalar(1.5);
+material
 
-        }
+);
 
-        // Store original position
+sphere.position.set(
 
-        sphere.userData.baseX = position[0];
+...position
 
-        sphere.userData.baseY = position[1];
+);
 
-        sphere.userData.baseZ = position[2];
+if(index===0){
 
-        sphere.userData.index = index;
+sphere.scale.setScalar(1.7);
 
-        scene.add(sphere);
+}else{
 
-        spheres.push(sphere);
+sphere.scale.setScalar(1);
 
-    });
+}
 
-    return spheres;
+sphere.userData.baseX=position[0];
+
+sphere.userData.baseY=position[1];
+
+sphere.userData.baseZ=position[2];
+
+sphere.userData.index=index;
+
+scene.add(sphere);
+
+spheres.push(sphere);
+
+});
+
+return spheres;
 
 }
