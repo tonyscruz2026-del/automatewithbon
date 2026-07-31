@@ -1,4 +1,4 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
 export function createCamera() {
 
@@ -10,7 +10,7 @@ export function createCamera() {
 
         0.1,
 
-        200
+        100
 
     );
 
@@ -18,9 +18,9 @@ export function createCamera() {
 
         0,
 
-        1.5,
+        1,
 
-        9
+        8
 
     );
 
