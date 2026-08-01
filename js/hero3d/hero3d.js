@@ -1,48 +1,161 @@
+// ======================================
+// IMPORTS
+// ======================================
+
 import { createScene } from "./core/scene.js";
 import { createCamera } from "./core/camera.js";
 import { createRenderer } from "./core/renderer.js";
+import { setupResize } from "./core/resize.js";
 
 import { createLights } from "./world/lights.js";
+import { createBackground } from "./world/background.js";
+import { createParticles } from "./world/particles.js";
+import { loadEnvironment } from "./world/loaders.js";
 
-import { createControls } from "./interaction/controls.js";
+import { createSpheres } from "./objects/spheres.js";
 
-const canvas =
-document.querySelector("#heroCanvas");
+import { createControls } from "./controls/controls.js";
 
-const scene =
-createScene();
+import { createEffects } from "./effects/effects.js";
 
-const camera =
-createCamera();
+import { animate } from "./animation/animation.js";
 
-const renderer =
-createRenderer(canvas);
+// ======================================
+// MAIN
+// ======================================
 
-createLights(scene);
+async function init() {
 
-const controls =
-createControls(
+    //----------------------------------
+    // Canvas
+    //----------------------------------
 
-    camera,
+    const canvas = document.getElementById("heroCanvas");
 
-    renderer
+    if (!canvas) {
 
-);
+        console.error("heroCanvas not found.");
 
-function animate(){
+        return;
 
-    requestAnimationFrame(animate);
+    }
 
-    controls.update();
+    //----------------------------------
+    // Core
+    //----------------------------------
 
-    renderer.render(
+    const scene = createScene();
 
-        scene,
+    const camera = createCamera();
 
-        camera
+    const renderer = createRenderer(canvas);
+
+    //----------------------------------
+    // World
+    //----------------------------------
+
+    createLights(scene);
+
+    createBackground(scene);
+
+    const particles = createParticles(scene);
+
+    //----------------------------------
+    // HDR Environment
+    //----------------------------------
+
+    try {
+
+        await loadEnvironment(scene);
+
+    } catch (err) {
+
+        console.warn("HDR skipped:", err);
+
+    }
+
+    //----------------------------------
+    // AI Core + Project Nodes
+    //----------------------------------
+
+    const spheres = createSpheres(scene);
+
+    //----------------------------------
+    // Controls
+    //----------------------------------
+
+    const controls = createControls(
+
+        camera,
+
+        renderer
 
     );
 
+    //----------------------------------
+    // Post Processing
+    //----------------------------------
+
+    let composer = null;
+
+    try {
+
+        composer = createEffects(
+
+            renderer,
+
+            scene,
+
+            camera
+
+        );
+
+    } catch (err) {
+
+        console.warn("Post-processing disabled.");
+
+    }
+
+    //----------------------------------
+    // Resize
+    //----------------------------------
+
+    setupResize(
+
+        camera,
+
+        renderer,
+
+        composer
+
+    );
+
+    //----------------------------------
+    // Animation
+    //----------------------------------
+
+    animate({
+
+        renderer,
+
+        composer,
+
+        scene,
+
+        camera,
+
+        controls,
+
+        spheres,
+
+        particles
+
+    });
+
 }
 
-animate();
+// ======================================
+// START
+// ======================================
+
+init();
