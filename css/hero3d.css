@@ -717,6 +717,167 @@ align-items:center;
 }
 
 /* ===========================
+   NODE ICON + TITLE WRAPPER
+   Stacks the icon above its title, both
+   centered inside the glass sphere — matches
+   the reference's icon+label pairing.
+=========================== */
+
+.node-icon-wrap{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+
+    pointer-events:none;
+
+}
+
+.node-title{
+
+    font-family:inherit;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    text-align:center;
+    white-space:nowrap;
+
+    color:#eaf7ff;
+
+    text-shadow:
+        0 0 6px rgba(120,220,255,0.85),
+        0 0 14px rgba(60,170,255,0.5);
+
+}
+
+/* ===========================
+   AI CORE LABEL
+   Bold centered "AI" lettering inside the
+   central sphere — same billboard technique
+   as the node icons, larger and brighter
+   since this is the focal point of the scene.
+=========================== */
+
+.ai-core-label{
+
+    font-family:inherit;
+    font-size:42px;
+    font-weight:800;
+    letter-spacing:0.04em;
+
+    color:#f2fbff;
+
+    text-shadow:
+        0 0 12px rgba(140,225,255,0.95),
+        0 0 32px rgba(80,190,255,0.7),
+        0 0 60px rgba(50,150,255,0.4);
+
+    pointer-events:none;
+
+}
+
+/* ===========================
+   HOLOGRAPHIC BASE
+   Flat, camera-facing ripple rings sitting
+   beneath each sphere (core and nodes alike),
+   evoking a projector/landing-pad glow.
+   Pure CSS animation — cheap regardless of
+   how many spheres are on screen.
+=========================== */
+
+.holo-base{
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:none;
+
+}
+
+.holo-base--core{
+
+    width:180px;
+    height:60px;
+
+}
+
+.holo-base--node{
+
+    width:90px;
+    height:32px;
+
+}
+
+.holo-ring{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    border-radius:50%;
+
+    border:1px solid rgba(120,210,255,0.55);
+
+    box-shadow:
+        0 0 12px rgba(90,190,255,0.4),
+        inset 0 0 12px rgba(90,190,255,0.25);
+
+    transform:translate(-50%,-50%) scaleX(1) scaleY(0.34);
+
+    animation:holoRipple 3.2s ease-out infinite;
+
+}
+
+.holo-base--core .holo-ring-1{ width:70%; height:70%; animation-delay:0s; }
+.holo-base--core .holo-ring-2{ width:70%; height:70%; animation-delay:1.05s; }
+.holo-base--core .holo-ring-3{ width:70%; height:70%; animation-delay:2.1s; }
+
+.holo-base--node .holo-ring-1{ width:75%; height:75%; animation-delay:0s; }
+.holo-base--node .holo-ring-2{ width:75%; height:75%; animation-delay:1.6s; }
+
+@keyframes holoRipple{
+
+    0%{
+
+        transform:translate(-50%,-50%) scaleX(0.3) scaleY(0.1);
+        opacity:0;
+
+    }
+
+    15%{
+
+        opacity:1;
+
+    }
+
+    70%{
+
+        opacity:0.35;
+
+    }
+
+    100%{
+
+        transform:translate(-50%,-50%) scaleX(1.6) scaleY(0.54);
+        opacity:0;
+
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce){
+
+    .holo-ring{ animation:none; opacity:0.5; }
+
+}
+
+/* ===========================
    NEXT SECTION PLACEHOLDER
    Swap this out for your real content —
    this just gives the page somewhere to
