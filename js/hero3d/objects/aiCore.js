@@ -1,66 +1,153 @@
 import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+import { createAiCoreNetwork } from "./aiCoreNetwork.js";
 
 // =========================================
 // AI Core
 //
-// HOW THIS WORKS (image-sprite technique):
+// Real WebGL geometry, built in layers (same idea as the
+// reference design, recreated as actual 3D objects instead
+// of a flattened photo pasted on a billboard):
 //
-// Instead of building the glass/glow look with a
-// WebGL shader, the reference design image itself
-// is used as the sphere. It's placed in a real DOM
-// <img>, wrapped in a CSS2DObject — the exact same
-// billboard technique already used for the "AI"
-// label and the holographic base rings. CSS2DObject
-// projects a 3D position onto the screen and moves a
-// real HTML element there every frame; it does NOT
-// touch WebGL rendering at all, which is why this
-// sidesteps every glass-shader problem from before.
+//   1. Atmosphere  — oversized backside sphere, fresnel rim
+//                    glow, additive blending. Reads as the
+//                    soft haze around the orb.
+//   2. Glass shell — MeshPhysicalMaterial sphere with real
+//                    transmission/iridescence, so it actually
+//                    refracts scene light like glass.
+//   3. Inner core  — small bright sphere at the center; this
+//                    is what bloom picks up as the hot glow.
+//   4. Lattice     — the geodesic wireframe network already
+//                    built in aiCoreNetwork.js (was defined
+//                    but never wired into the scene before).
+//   5. Core light  — a real PointLight living inside the
+//                    sphere so the shell/lattice/nearby nodes
+//                    catch true light, not just emissive color.
 //
-// Two consequences worth knowing:
-// 1. Size is controlled entirely by CSS pixels (see
-//    .ai-core-sprite-wrap), NOT by 3D scale — a
-//    THREE.Object3D's .scale has no effect on a
-//    CSS2DObject's on-screen size, only its .position
-//    matters. That's also why the old pulse animation
-//    (aiCore.scale.setScalar) is gone below; the pulse
-//    is now done in animate.js via CSS transform on
-//    the <img> instead.
-// 2. The image's near-black background disappears via
-//    mix-blend-mode:screen in CSS (see hero3d.css) —
-//    black contributes nothing under "screen" blending,
-//    so it reads as transparent against the dark hero
-//    background with no manual masking needed.
+// Because this is now genuine geometry, group.scale / rotation
+// actually do something again — see animate.js.
 // =========================================
+
+const CORE_RADIUS = 1.0;
+
+const ATMOSPHERE_VERTEX = `
+    varying vec3 vNormal;
+    void main() {
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+`;
+
+const ATMOSPHERE_FRAGMENT = `
+    uniform vec3 glowColor;
+    uniform float intensity;
+    varying vec3 vNormal;
+    void main() {
+        float rim = pow(0.62 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.4);
+        gl_FragColor = vec4(glowColor, clamp(rim, 0.0, 1.0) * intensity);
+    }
+`;
 
 export function createAiCore(scene) {
 
     const group = new THREE.Group();
 
     // =====================================
-    // Sphere Sprite
+    // Atmosphere — soft outer glow
     // =====================================
 
-    const wrap = document.createElement("div");
-    wrap.className = "ai-core-sprite-wrap";
+    const atmosphereGeometry = new THREE.SphereGeometry(
+        CORE_RADIUS * 1.4,
+        48,
+        48
+    );
 
-    const img = document.createElement("img");
-    img.className = "ai-core-sprite";
-    img.src = "assets/hero3d/ai-core.png";
-    img.alt = "";
+    const atmosphereMaterial = new THREE.ShaderMaterial({
 
-    wrap.appendChild(img);
+        uniforms: {
+            glowColor: { value: new THREE.Color(0x4fc3ff) },
+            intensity: { value: 1.0 }
+        },
 
-    const sprite = new CSS2DObject(wrap);
-    sprite.position.set(0, 0, 0);
-    group.add(sprite);
+        vertexShader: ATMOSPHERE_VERTEX,
+        fragmentShader: ATMOSPHERE_FRAGMENT,
+
+        side: THREE.BackSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        depthWrite: false
+
+    });
+
+    const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+    group.add(atmosphere);
+
+    // =====================================
+    // Glass shell — real transmission, not a texture
+    // =====================================
+
+    const shellGeometry = new THREE.SphereGeometry(CORE_RADIUS, 96, 96);
+
+    const shellMaterial = new THREE.MeshPhysicalMaterial({
+
+        color: 0x1c3f78,
+
+        transmission: 0.85,
+        thickness: 1.4,
+        roughness: 0.1,
+        metalness: 0,
+        ior: 1.35,
+
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.2,
+
+        iridescence: 0.5,
+        iridescenceIOR: 1.3,
+
+        emissive: 0x1a5fd6,
+        emissiveIntensity: 0.35,
+
+        transparent: true,
+        opacity: 0.9
+
+    });
+
+    const shell = new THREE.Mesh(shellGeometry, shellMaterial);
+    group.add(shell);
+
+    // =====================================
+    // Inner core — bright hot center, bloom's target
+    // =====================================
+
+    const innerGeometry = new THREE.SphereGeometry(CORE_RADIUS * 0.3, 32, 32);
+
+    const innerMaterial = new THREE.MeshBasicMaterial({
+        color: 0xdff6ff
+    });
+
+    const inner = new THREE.Mesh(innerGeometry, innerMaterial);
+    group.add(inner);
+
+    // =====================================
+    // Neural lattice — real geodesic wireframe
+    // (already built in aiCoreNetwork.js; just needed wiring)
+    // =====================================
+
+    const network = createAiCoreNetwork();
+    group.add(network);
+
+    // =====================================
+    // Core light — lights the shell/lattice/nearby nodes for real
+    // =====================================
+
+    const coreLight = new THREE.PointLight(0x6fd6ff, 10, 7);
+    coreLight.position.set(0, 0, 0);
+    group.add(coreLight);
 
     // =====================================
     // Focus Mode — vertical light beam
-    // Unchanged from before: this is real WebGL
-    // geometry (not part of the sphere image), still
-    // driven every frame from animate.js via the
-    // "beam" value from aiCoreStates.getCoreState().
+    // Unchanged: real WebGL geometry, driven every frame from
+    // animate.js via the "beam" value from aiCoreStates.getCoreState().
     // Hidden (scale 0) outside Focus Mode.
     // =====================================
 
@@ -96,7 +183,7 @@ export function createAiCore(scene) {
 
     // =====================================
     // Holographic Base
-    // Unchanged — same billboard technique as before.
+    // Unchanged — camera-facing CSS billboard rings.
     // =====================================
 
     const baseEl = document.createElement("div");
@@ -110,12 +197,14 @@ export function createAiCore(scene) {
     base.position.set(0, -1.35, 0);
     group.add(base);
 
-    // spriteImg is what animate.js pulses on each frame — see the
-    // "spriteImg" block in the AI Core section of animate.js.
     group.userData = {
 
         beam,
-        spriteImg: img
+        atmosphere,
+        shell,
+        inner,
+        network,
+        coreLight
 
     };
 
