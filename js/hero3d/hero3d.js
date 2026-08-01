@@ -61,6 +61,17 @@ function init() {
 
     );
 
+    const tooltip = document.getElementById("nodeTooltip");
+
+    function positionTooltip(event) {
+
+        if (!tooltip) return;
+
+        tooltip.style.transform =
+            "translate(" + (event.clientX + 18) + "px, " + (event.clientY - 12) + "px)";
+
+    }
+
     createRaycaster(
 
         camera,
@@ -71,7 +82,25 @@ function init() {
 
         {
 
-            onSelect: (data) => infoPanel.show(data)
+            onSelect: (data) => infoPanel.show(data),
+
+            onHover: (data, event) => {
+
+                if (!tooltip) return;
+
+                if (data) {
+
+                    tooltip.textContent = data.title;
+                    tooltip.classList.add("is-visible");
+                    if (event) positionTooltip(event);
+
+                } else {
+
+                    tooltip.classList.remove("is-visible");
+
+                }
+
+            }
 
         }
 
