@@ -1,6 +1,8 @@
 import * as THREE from "three";
 
 import { updateOrbit } from "../objects/orbitSystem.js";
+import { getCoreState } from "../objects/aiCoreStates.js";
+import { updateAiCoreNetwork } from "../objects/aiCoreNetwork.js";
 
 const clock = new THREE.Clock();
 
@@ -36,36 +38,65 @@ export function animate({
 
         //----------------------------------
         // AI Core (shell / inner / glow)
+        // Base pulse/rotation is the original
+        // ambient motion; the dynamic-state
+        // multipliers from aiCoreStates.js
+        // scale on top of it, so Idle still
+        // looks like the original calm core
+        // and the other states build up from
+        // there rather than replacing it.
         //----------------------------------
+
+        const coreState = getCoreState(t);
 
         if (aiCore) {
 
-            const pulse = 1 + Math.sin(t * 3) * 0.05;
+            const pulse = 1 + Math.sin(t * 3) * 0.05 * coreState.emissive;
 
             aiCore.scale.setScalar(pulse);
 
-            aiCore.rotation.y += 0.003;
-            aiCore.rotation.x += 0.001;
+            aiCore.rotation.y += 0.003 * coreState.rotation;
+            aiCore.rotation.x += 0.001 * coreState.rotation;
 
             const parts = aiCore.userData || {};
 
             if (parts.glow) {
 
                 parts.glow.scale.setScalar(
-                    1.05 + Math.sin(t * 3) * 0.08
+                    1.05 + Math.sin(t * 3) * 0.08 * coreState.glow
                 );
 
                 parts.glow.material.opacity =
-                    0.12 +
-                    Math.sin(t * 3) * 0.05;
+                    (0.12 +
+                    Math.sin(t * 3) * 0.05) * coreState.glow;
 
             }
 
             if (parts.inner && parts.inner.material.emissiveIntensity !== undefined) {
 
                 parts.inner.material.emissiveIntensity =
-                    5 +
-                    Math.sin(t * 3) * 1.2;
+                    (5 +
+                    Math.sin(t * 3) * 1.2) * coreState.emissive;
+
+            }
+
+            if (parts.network) {
+
+                updateAiCoreNetwork(parts.network, t, coreState.network);
+
+            }
+
+            if (parts.beam) {
+
+                // Vertical scale grows with the beam value; opacity
+                // fades in alongside it so it never pops in at full
+                // strength. Kept at a floor of 0.0001 rather than 0
+                // since a zero Y-scale on a cylinder can produce
+                // degenerate geometry warnings in some browsers.
+                const beamScale = Math.max(0.0001, coreState.beam);
+
+                parts.beam.scale.y = beamScale;
+                parts.beam.material.opacity = coreState.beam * 0.5;
 
             }
 
