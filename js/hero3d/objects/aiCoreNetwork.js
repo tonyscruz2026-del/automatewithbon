@@ -1,54 +1,61 @@
 import * as THREE from "three";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 
 // =========================================
 // AI Core — inner neural network
 //
-// A sparse cloud of points inside the core's
-// inner sphere volume, connected to nearby
-// neighbors by faint lines. Kept small (18
-// points) since this sits behind bloom and
-// inside a glass shell — detail beyond this
-// count isn't visible and isn't worth the
-// per-frame distance-check cost.
+// A geodesic wireframe wrapped around the core's
+// inner volume, matching the reference design's
+// "lattice across the whole globe" look — not a
+// loose cloud of floating points. Built from an
+// icosahedron's own edges and vertices, so lines
+// and nodes always line up exactly (no distance
+// threshold, no rejection sampling).
 // =========================================
 
-const POINT_COUNT = 18;
-const INNER_RADIUS = 0.6;
-const LINK_DISTANCE = 0.55;
+const NETWORK_RADIUS = 0.95;
+const DETAIL = 2; // subdivision level — 2 gives a dense but readable lattice
 
 export function createAiCoreNetwork() {
 
     const group = new THREE.Group();
 
-    const positions = new Float32Array(POINT_COUNT * 3);
+    // Base geometry: an icosphere. PolyhedronGeometry (which
+    // IcosahedronGeometry extends) duplicates vertices per-face, so
+    // merge them first — otherwise the point cloud below would draw
+    // several overlapping points at every shared vertex.
+    const icoGeometry = mergeVertices(
+        new THREE.IcosahedronGeometry(NETWORK_RADIUS, DETAIL)
+    );
 
-    for (let i = 0; i < POINT_COUNT; i++) {
+    // =====================================
+    // Lattice lines — the sphere's own edges
+    // =====================================
 
-        // Random point inside a sphere volume (not just the
-        // surface) via rejection sampling — simple, and 18
-        // points converges in a handful of tries at worst.
-        let x, y, z, lenSq;
+    const edgesGeometry = new THREE.EdgesGeometry(icoGeometry);
 
-        do {
+    const lineMaterial = new THREE.LineBasicMaterial({
 
-            x = (Math.random() * 2 - 1);
-            y = (Math.random() * 2 - 1);
-            z = (Math.random() * 2 - 1);
+        color: 0x5fc9ff,
+        transparent: true,
+        opacity: 0.45,
+        depthWrite: false
 
-            lenSq = x * x + y * y + z * z;
+    });
 
-        } while (lenSq > 1 || lenSq === 0);
+    const lines = new THREE.LineSegments(edgesGeometry, lineMaterial);
+    group.add(lines);
 
-        positions[i * 3] = x * INNER_RADIUS;
-        positions[i * 3 + 1] = y * INNER_RADIUS;
-        positions[i * 3 + 2] = z * INNER_RADIUS;
-
-    }
+    // =====================================
+    // Node points — sit exactly at lattice
+    // intersections, since they reuse the
+    // same vertex positions as the edges.
+    // =====================================
 
     const pointsGeometry = new THREE.BufferGeometry();
     pointsGeometry.setAttribute(
         "position",
-        new THREE.BufferAttribute(positions, 3)
+        icoGeometry.getAttribute("position").clone()
     );
 
     const pointsMaterial = new THREE.PointsMaterial({
@@ -57,58 +64,13 @@ export function createAiCoreNetwork() {
         size: 0.045,
         transparent: true,
         opacity: 0.9,
-        depthWrite: false
+        depthWrite: false,
+        sizeAttenuation: true
 
     });
 
     const points = new THREE.Points(pointsGeometry, pointsMaterial);
     group.add(points);
-
-    // Pre-compute which pairs are within LINK_DISTANCE once, since
-    // the points themselves don't move relative to each other —
-    // only the whole group rotates. No need to recheck every frame.
-    const linePositions = [];
-
-    for (let a = 0; a < POINT_COUNT; a++) {
-
-        for (let b = a + 1; b < POINT_COUNT; b++) {
-
-            const dx = positions[a * 3] - positions[b * 3];
-            const dy = positions[a * 3 + 1] - positions[b * 3 + 1];
-            const dz = positions[a * 3 + 2] - positions[b * 3 + 2];
-
-            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-            if (dist < LINK_DISTANCE) {
-
-                linePositions.push(
-                    positions[a * 3], positions[a * 3 + 1], positions[a * 3 + 2],
-                    positions[b * 3], positions[b * 3 + 1], positions[b * 3 + 2]
-                );
-
-            }
-
-        }
-
-    }
-
-    const lineGeometry = new THREE.BufferGeometry();
-    lineGeometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(new Float32Array(linePositions), 3)
-    );
-
-    const lineMaterial = new THREE.LineBasicMaterial({
-
-        color: 0x5fc9ff,
-        transparent: true,
-        opacity: 0.35,
-        depthWrite: false
-
-    });
-
-    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
-    group.add(lines);
 
     group.userData = { points, lines };
 
@@ -117,14 +79,17 @@ export function createAiCoreNetwork() {
 }
 
 // activity is the state-driven multiplier (from aiCoreStates.js —
-// "network" field) so the whole cluster spins faster and glows
+// "network" field) so the whole lattice spins faster and glows
 // brighter during Processing / High Activity than at Idle.
 export function updateAiCoreNetwork(network, t, activity) {
 
     if (!network) return;
 
-    network.rotation.y = t * 0.25 * activity;
-    network.rotation.x = Math.sin(t * 0.15) * 0.2;
+    // Slower base rotation than the old point-cloud version — a full
+    // geodesic lattice reads as spinning structure even at low speed,
+    // where the old sparse cloud needed faster motion to register.
+    network.rotation.y = t * 0.12 * activity;
+    network.rotation.x = Math.sin(t * 0.1) * 0.15;
 
     const parts = network.userData || {};
 
@@ -141,7 +106,7 @@ export function updateAiCoreNetwork(network, t, activity) {
 
         parts.lines.material.opacity = Math.min(
             0.6,
-            0.2 + activity * 0.08
+            0.3 + activity * 0.08
         );
 
     }
