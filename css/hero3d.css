@@ -12,8 +12,8 @@ html,
 body{
 
     width:100%;
-    height:100%;
-    overflow:hidden;
+    min-height:100%;
+    overflow-x:hidden;
 
     font-family:"Inter", sans-serif;
 
@@ -23,12 +23,29 @@ body{
 }
 
 /* ===========================
+   HERO SCROLL WRAPPER
+   Extra height beyond 100vh gives the
+   page something to scroll through
+   while the hero stays pinned, which is
+   what drives the scroll parallax.
+=========================== */
+
+.hero-scroll-wrapper{
+
+    position:relative;
+
+    height:240vh;
+
+}
+
+/* ===========================
    HERO
 =========================== */
 
 .hero{
 
-    position:relative;
+    position:sticky;
+    top:0;
 
     width:100vw;
     height:100vh;
@@ -38,6 +55,62 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+
+}
+
+/* ===========================
+   SCROLL CUE
+=========================== */
+
+.scroll-cue{
+
+    position:absolute;
+
+    bottom:2.2rem;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.55rem;
+
+    z-index:5;
+
+    color:#9fc9ff;
+
+    font-size:0.7rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+
+    opacity:0.75;
+
+    pointer-events:none;
+
+}
+
+.scroll-cue-line{
+
+    width:1px;
+    height:34px;
+
+    background:linear-gradient(to bottom, rgba(159,201,255,0.9), transparent);
+
+    animation:scrollCuePulse 1.8s ease-in-out infinite;
+
+}
+
+@keyframes scrollCuePulse{
+
+    0%, 100%{ transform:scaleY(0.55); opacity:0.35; }
+    50%{ transform:scaleY(1); opacity:1; }
+
+}
+
+@media (max-width:640px){
+
+    .scroll-cue{ display:none; }
 
 }
 
@@ -489,19 +562,78 @@ align-items:center;
 
 .node-label{
 
-    background:rgba(5,7,13,0.72);
-    border:1px solid rgba(42,168,255,0.35);
-    border-radius:100px;
+    /* No pill/background — plain text with a strong dark halo reads
+       cleanly against the busy starfield behind it, matching the
+       reference design. */
 
-    padding:0.3rem 0.75rem;
+    text-align:center;
 
     font-family:"Inter", sans-serif;
-    font-size:0.72rem;
-    font-weight:600;
-    letter-spacing:0.01em;
-    color:#c7d0e5;
+    font-size:0.78rem;
+    font-weight:700;
+    letter-spacing:0.02em;
+    line-height:1.35;
+    color:#f0f6ff;
+
+    text-shadow:
+        0 0 3px rgba(0,0,0,0.9),
+        0 0 10px rgba(0,10,30,0.85),
+        0 2px 6px rgba(0,0,0,0.6);
+
     white-space:nowrap;
 
     pointer-events:none;
+
+}
+
+/* ===========================
+   ICON CENTERED INSIDE EACH SPHERE
+=========================== */
+
+.node-icon{
+
+    width:34px;
+    height:34px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#8fe3ff;
+
+    filter:
+        drop-shadow(0 0 6px rgba(120,220,255,0.85))
+        drop-shadow(0 0 16px rgba(60,170,255,0.5));
+
+    pointer-events:none;
+
+}
+
+.node-icon svg{
+
+    width:100%;
+    height:100%;
+
+}
+
+/* ===========================
+   NEXT SECTION PLACEHOLDER
+   Swap this out for your real content —
+   this just gives the page somewhere to
+   scroll to beneath the pinned hero.
+=========================== */
+
+.next-section-placeholder{
+
+    min-height:100vh;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#05070d;
+    color:#5c6b85;
+
+    font-size:0.9rem;
 
 }
