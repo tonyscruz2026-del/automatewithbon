@@ -1,6 +1,6 @@
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
-import { updateOrbit } from "../systems/orbit.js";
+import { updateOrbit } from "../objects/orbitSystem.js";
 
 const clock = new THREE.Clock();
 
