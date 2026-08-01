@@ -146,7 +146,7 @@ function createIconPanel(imageSrc, radius) {
 // inherits whatever that internal offset is.
 // =========================================
 
-function attachModelAndIcon(node, imageSrc) {
+function attachModelAndIcon(node) {
 
     loadSharedCoreModel()
         .then((gltf) => {
@@ -156,17 +156,10 @@ function attachModelAndIcon(node, imageSrc) {
 
             node.add(model);
 
-            const box = new THREE.Box3().setFromObject(model);
-            const boundingSphere = new THREE.Sphere();
-            box.getBoundingSphere(boundingSphere);
-
-            const panel = createIconPanel(imageSrc, boundingSphere.radius);
-            panel.position.copy(boundingSphere.center);
-
-            // Parented to the model itself, not the outer node — so
-            // if the model has any internal rotation/offset, the icon
-            // rides along with it automatically.
-            model.add(panel);
+            // No more icon panel here — the GLB model is the sphere's
+            // full visual now, so the old flat-image "dome" glued on
+            // top of it has been removed. That dome was the floating
+            // half-sphere artifact showing up in the hero.
 
         })
         .catch((err) => {
@@ -192,12 +185,6 @@ function attachModelAndIcon(node, imageSrc) {
 
             const fallbackSphere = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
             node.add(fallbackSphere);
-
-            // The fallback IS the plain procedural sphere centered at
-            // origin, so the original NODE_RADIUS assumption is
-            // correct here.
-            const panel = createIconPanel(imageSrc, NODE_RADIUS);
-            fallbackSphere.add(panel);
 
         });
 
@@ -260,7 +247,7 @@ export function createProjectNodes(scene, aiCore) {
 
         const node = createHitTarget();
 
-        attachModelAndIcon(node, NODE_IMAGES[index % NODE_IMAGES.length]);
+        attachModelAndIcon(node);
         node.add(createHoloBase());
 
         node.userData = {
