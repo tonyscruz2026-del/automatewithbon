@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const NODE_RADIUS = 0.52;
+const NODE_RADIUS = 0.64;
 const CAP_ANGLE = Math.PI * 0.47; // slightly under a full hemisphere — same technique as the icon panel below
 
 const GLB_PATH = "assets/hero3d/ai_sphere.glb";
@@ -153,6 +153,19 @@ function attachModelAndIcon(node) {
 
             const model = gltf.scene.clone(true);
             model.scale.setScalar(NODE_GLB_SCALE);
+
+            // The GLB's mesh isn't necessarily centered on its own
+            // origin (depends on how it was exported), so measure its
+            // real bounding-sphere center and shift the model to
+            // cancel that offset out. That way the model's visual
+            // middle lands exactly on the node's local (0,0,0) —
+            // which is also where the label below is positioned — so
+            // icon+title always sit dead center in the sphere.
+            const box = new THREE.Box3().setFromObject(model);
+            const boundingSphere = new THREE.Sphere();
+            box.getBoundingSphere(boundingSphere);
+
+            model.position.sub(boundingSphere.center);
 
             node.add(model);
 
