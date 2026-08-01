@@ -1,52 +1,23 @@
-// ======================================
-// CORE
-// ======================================
-
 import { createScene } from "./core/scene.js";
 import { createCamera } from "./core/camera.js";
 import { createRenderer } from "./core/renderer.js";
 import { setupResize } from "./core/resize.js";
 
-// ======================================
-// WORLD
-// ======================================
-
 import { createLights } from "./world/lights.js";
-
-// ======================================
-// OBJECTS
-// ======================================
 
 import { createAiCore } from "./objects/aiCore.js";
 import { createProjectNodes } from "./objects/projectNode.js";
 
-// ======================================
-// INTERACTION
-// ======================================
-
 import { createControls } from "./interaction/controls.js";
+import { createRaycaster } from "./interaction/raycaster.js";
 
-// ======================================
-// EFFECTS
-// ======================================
+import { createInfoPanel } from "./ui/infoPanel.js";
 
 import { createBloom } from "./effects/bloom.js";
 
-// ======================================
-// ANIMATION
-// ======================================
-
 import { animate } from "./animation/animate.js";
 
-// ======================================
-// INIT
-// ======================================
-
 function init() {
-
-    //----------------------------------
-    // Canvas
-    //----------------------------------
 
     const canvas = document.getElementById("heroCanvas");
 
@@ -58,25 +29,13 @@ function init() {
 
     }
 
-    //----------------------------------
-    // Core
-    //----------------------------------
-
     const scene = createScene();
 
     const camera = createCamera();
 
     const renderer = createRenderer(canvas);
 
-    //----------------------------------
-    // World
-    //----------------------------------
-
     createLights(scene);
-
-    //----------------------------------
-    // Objects
-    //----------------------------------
 
     const aiCore = createAiCore(scene);
 
@@ -88,10 +47,6 @@ function init() {
 
     );
 
-    //----------------------------------
-    // Controls
-    //----------------------------------
-
     const controls = createControls(
 
         camera,
@@ -100,9 +55,27 @@ function init() {
 
     );
 
-    //----------------------------------
-    // Post Processing
-    //----------------------------------
+    const infoPanel = createInfoPanel(
+
+        document.getElementById("projectPanel")
+
+    );
+
+    createRaycaster(
+
+        camera,
+
+        renderer,
+
+        projectNodes,
+
+        {
+
+            onSelect: (data) => infoPanel.show(data)
+
+        }
+
+    );
 
     let composer = null;
 
@@ -124,10 +97,6 @@ function init() {
 
     }
 
-    //----------------------------------
-    // Resize
-    //----------------------------------
-
     setupResize(
 
         camera,
@@ -137,10 +106,6 @@ function init() {
         composer
 
     );
-
-    //----------------------------------
-    // Animation
-    //----------------------------------
 
     animate({
 
@@ -161,9 +126,5 @@ function init() {
     });
 
 }
-
-// ======================================
-// START
-// ======================================
 
 init();
