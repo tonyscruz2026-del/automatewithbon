@@ -19,7 +19,8 @@ export function animate({
     parallax,
     parallaxGroup,
     starsGroup,
-    heroContentEl
+    heroContentEl,
+    atmosphere
 
 }) {
 
@@ -132,6 +133,17 @@ export function animate({
             starsGroup.position.y =
                 p.mouseY * -0.08 -
                 p.scroll * 0.8;
+
+        }
+
+        //----------------------------------
+        // Parallax layer: space-cloud atmosphere
+        // (moves out of frame as you scroll)
+        //----------------------------------
+
+        if (atmosphere) {
+
+            atmosphere.update(p);
 
         }
 
