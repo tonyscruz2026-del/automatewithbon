@@ -2,6 +2,7 @@ import { createScene } from "./core/scene.js";
 import { createCamera } from "./core/camera.js";
 import { createRenderer } from "./core/renderer.js";
 import { setupResize } from "./core/resize.js";
+import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 
 import { createLights } from "./world/lights.js";
 
@@ -12,6 +13,7 @@ import { createControls } from "./interaction/controls.js";
 import { createRaycaster } from "./interaction/raycaster.js";
 
 import { createInfoPanel } from "./ui/infoPanel.js";
+import { createNodeLabels } from "./ui/nodeLabels.js";
 
 import { createBloom } from "./effects/bloom.js";
 
@@ -46,6 +48,26 @@ function init() {
         aiCore
 
     );
+
+    const labelLayer = document.getElementById("labelLayer");
+    let labelRenderer = null;
+
+    if (labelLayer) {
+
+        labelRenderer = new CSS2DRenderer();
+
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+
+        labelRenderer.domElement.style.position = "absolute";
+        labelRenderer.domElement.style.top = "0";
+        labelRenderer.domElement.style.left = "0";
+        labelRenderer.domElement.style.pointerEvents = "none";
+
+        labelLayer.appendChild(labelRenderer.domElement);
+
+        createNodeLabels(projectNodes);
+
+    }
 
     const controls = createControls(
 
@@ -132,7 +154,9 @@ function init() {
 
         renderer,
 
-        composer
+        composer,
+
+        labelRenderer
 
     );
 
@@ -150,7 +174,9 @@ function init() {
 
         aiCore,
 
-        projectNodes
+        projectNodes,
+
+        labelRenderer
 
     });
 
