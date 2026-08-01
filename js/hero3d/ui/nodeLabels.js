@@ -1,8 +1,10 @@
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
 // =========================================
-// One clean line-icon per project, centered
-// inside the glass sphere.
+// One clean line-icon per project, plus its
+// title beneath it, centered inside the
+// glass sphere — matches the reference's
+// "Inner Holographic Icon" + label pairing.
 // =========================================
 
 const ICONS = {
@@ -55,15 +57,23 @@ export function createNodeLabels(projectNodes) {
 
         const title = (sphere.userData && sphere.userData.title) || "";
 
-        // Icon only — centered inside the glass sphere. No floating
-        // text label; the icon alone is enough to read at this size.
+        // Icon + title, stacked — centered inside the glass sphere.
+
+        const wrapEl = document.createElement("div");
+        wrapEl.className = "node-icon-wrap";
 
         const iconEl = document.createElement("div");
-
         iconEl.className = "node-icon";
         iconEl.innerHTML = ICONS[title] || "";
 
-        const iconObject = new CSS2DObject(iconEl);
+        const titleEl = document.createElement("div");
+        titleEl.className = "node-title";
+        titleEl.textContent = title;
+
+        wrapEl.appendChild(iconEl);
+        wrapEl.appendChild(titleEl);
+
+        const iconObject = new CSS2DObject(wrapEl);
 
         iconObject.position.set(0, 0, 0);
 
