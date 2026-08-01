@@ -48,9 +48,13 @@ export function createRaycaster(camera, renderer, projectNodes, callbacks = {}) 
 
             if (callbacks.onHover) {
 
-                callbacks.onHover(hovered ? hovered.userData : null);
+                callbacks.onHover(hovered ? hovered.userData : null, event);
 
             }
+
+        } else if (hovered && callbacks.onHover) {
+
+            callbacks.onHover(hovered.userData, event);
 
         }
 
@@ -98,6 +102,12 @@ export function createRaycaster(camera, renderer, projectNodes, callbacks = {}) 
         hovered = null;
 
         el.style.cursor = "";
+
+        if (callbacks.onHover) {
+
+            callbacks.onHover(null);
+
+        }
 
     });
 
