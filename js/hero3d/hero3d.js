@@ -18,6 +18,7 @@ import { createParallax } from "./interaction/parallax.js";
 
 import { createInfoPanel } from "./ui/infoPanel.js";
 import { createNodeLabels } from "./ui/nodeLabels.js";
+import { createAtmosphere } from "./ui/atmosphere.js";
 
 import { createBloom } from "./effects/bloom.js";
 
@@ -188,6 +189,8 @@ function init() {
 
     const heroContentEl = document.querySelector(".hero-content");
 
+    const atmosphere = createAtmosphere();
+
     animate({
 
         renderer,
@@ -212,7 +215,9 @@ function init() {
 
         starsGroup,
 
-        heroContentEl
+        heroContentEl,
+
+        atmosphere
 
     });
 
