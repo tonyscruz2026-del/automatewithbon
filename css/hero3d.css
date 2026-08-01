@@ -468,3 +468,40 @@ align-items:center;
         display:none;
     }
 }
+
+/* ===========================
+   ALWAYS-ON SPHERE LABELS
+=========================== */
+
+.label-layer{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:3;
+
+    pointer-events:none;
+
+    overflow:hidden;
+
+}
+
+.node-label{
+
+    background:rgba(5,7,13,0.72);
+    border:1px solid rgba(42,168,255,0.35);
+    border-radius:100px;
+
+    padding:0.3rem 0.75rem;
+
+    font-family:"Inter", sans-serif;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.01em;
+    color:#c7d0e5;
+    white-space:nowrap;
+
+    pointer-events:none;
+
+}
