@@ -1,12 +1,14 @@
 export function updateOrbit(spheres, time) {
 
-    spheres.forEach((sphere, index) => {
+    if (!spheres || spheres.length < 2) return;
 
-        if (index === 0) return;
+    for (let i = 1; i < spheres.length; i++) {
 
-        const radius = sphere.userData.radius;
-        const speed = sphere.userData.speed;
-        const offset = sphere.userData.offset;
+        const sphere = spheres[i];
+
+        const radius = sphere.userData.radius ?? 3;
+        const speed = sphere.userData.speed ?? 0.3;
+        const offset = sphere.userData.offset ?? 0;
 
         const angle = time * speed + offset;
 
@@ -14,11 +16,10 @@ export function updateOrbit(spheres, time) {
 
         sphere.position.z = Math.sin(angle) * radius;
 
-        sphere.position.y =
-            Math.sin(time * 2 + offset) * 0.25;
+        sphere.position.y = Math.sin(time * 2 + offset) * 0.25;
 
         sphere.lookAt(0, 0, 0);
 
-    });
+    }
 
 }
