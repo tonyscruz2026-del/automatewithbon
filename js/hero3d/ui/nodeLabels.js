@@ -55,7 +55,8 @@ export function createNodeLabels(projectNodes) {
 
         const title = (sphere.userData && sphere.userData.title) || "";
 
-        // -------- Icon: centered inside the glass sphere --------
+        // Icon only — centered inside the glass sphere. No floating
+        // text label; the icon alone is enough to read at this size.
 
         const iconEl = document.createElement("div");
 
@@ -67,30 +68,6 @@ export function createNodeLabels(projectNodes) {
         iconObject.position.set(0, 0, 0);
 
         sphere.add(iconObject);
-
-        // -------- Label: clean text sitting below the sphere --------
-
-        const labelEl = document.createElement("div");
-
-        labelEl.className = "node-label";
-
-        // Two-word titles break onto two short lines, matching the
-        // reference layout ("Workflow" / "Builder").
-        const words = title.split(" ");
-
-        labelEl.innerHTML = words.length > 1
-            ? words.slice(0, -1).join(" ") + "<br>" + words[words.length - 1]
-            : title;
-
-        const labelObject = new CSS2DObject(labelEl);
-
-        // Sits just below the sphere's own local center. Since this is
-        // added as a child of the sphere mesh, it inherits the sphere's
-        // position every frame (orbit + self-rotation) automatically —
-        // no manual per-frame syncing needed.
-        labelObject.position.set(0, -0.85, 0);
-
-        sphere.add(labelObject);
 
     });
 
