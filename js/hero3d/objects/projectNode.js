@@ -3,73 +3,41 @@ import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
 const NODE_RADIUS = 0.52;
 
-// =========================================
-// Glass shell material — real transmission
-// refraction (matches the AI core's shell),
-// replacing the old flat transparent+opacity
-// look with actual "Glossy Glass Outer Shell"
-// per the design reference. transmission is
-// the single most expensive PBR feature here,
-// but at NODE_RADIUS scale and 5 instances
-// total it stays comfortably cheap.
-// =========================================
+// One reference-design node icon per project, in the same order as
+// the projects array below. Swap these filenames for per-project
+// custom art later; for now they're crops from the "Node Sphere
+// Variants" reference image.
+const NODE_IMAGES = [
 
-function createShellMaterial() {
+    "assets/hero3d/node-lead.png",       // Messenger AI
+    "assets/hero3d/node-growth.png",     // CRM Automation
+    "assets/hero3d/node-review.png",     // Review Manager
+    "assets/hero3d/node-marketing.png",  // Voice AI
+    "assets/hero3d/node-booking.png"     // Workflow Builder
 
-    return new THREE.MeshPhysicalMaterial({
-
-        color: 0x0d1b30,
-
-        transparent: true,
-
-        opacity: 0.35,
-
-        roughness: 0.05,
-
-        metalness: 0,
-
-        transmission: 0.85,
-
-        thickness: 0.8,
-
-        ior: 1.45,
-
-        clearcoat: 1,
-
-        clearcoatRoughness: 0.05,
-
-        emissive: 0x1c7dff,
-
-        emissiveIntensity: 0.35,
-
-        side: THREE.DoubleSide
-
-    });
-
-}
+];
 
 // =========================================
-// Soft outer rim glow (additive, back-facing)
+// Invisible hit-target
+//
+// raycaster.js does raycaster.intersectObjects(projectNodes) against
+// real WebGL geometry — a CSS2DObject (a DOM element) can't be hit
+// this way. So each node is still a real THREE.Mesh, just fully
+// transparent (opacity 0, but visible: true so THREE.Raycaster
+// doesn't skip it). The visible image sprite is attached to this
+// mesh as a child, so it inherits the mesh's position automatically
+// every frame from orbitSystem.js — no raycaster/orbit code needed
+// to change at all.
 // =========================================
 
-function createGlow() {
+function createHitTarget() {
 
-    const geometry = new THREE.SphereGeometry(
-        NODE_RADIUS * 1.22,
-        32,
-        32
-    );
+    const geometry = new THREE.SphereGeometry(NODE_RADIUS, 24, 24);
 
     const material = new THREE.MeshBasicMaterial({
 
-        color: 0x5fd4ff,
-
         transparent: true,
-
-        opacity: 0.16,
-
-        side: THREE.BackSide,
-
+        opacity: 0,
         depthWrite: false
 
     });
@@ -79,11 +47,33 @@ function createGlow() {
 }
 
 // =========================================
-// Holographic base — flat ripple ring under
-// each node, same billboard technique as the
-// AI core's base. Kept as a small helper here
-// since every node needs one, not just the
-// core.
+// Image sprite — same billboard technique as
+// the AI core (see aiCore.js for the full
+// explanation of how CSS2DObject + mix-blend-
+// mode:screen works together).
+// =========================================
+
+function createSprite(imageSrc) {
+
+    const wrap = document.createElement("div");
+    wrap.className = "node-sprite-wrap";
+
+    const img = document.createElement("img");
+    img.className = "node-sprite";
+    img.src = imageSrc;
+    img.alt = "";
+
+    wrap.appendChild(img);
+
+    const sprite = new CSS2DObject(wrap);
+    sprite.position.set(0, 0, 0);
+
+    return sprite;
+
+}
+
+// =========================================
+// Holographic base — unchanged from before.
 // =========================================
 
 function createHoloBase() {
@@ -141,18 +131,12 @@ export function createProjectNodes(scene, aiCore) {
 
     projects.forEach((project, index) => {
 
-        const sphere = new THREE.Mesh(
+        const node = createHitTarget();
 
-            new THREE.SphereGeometry(NODE_RADIUS, 48, 48),
+        node.add(createSprite(NODE_IMAGES[index % NODE_IMAGES.length]));
+        node.add(createHoloBase());
 
-            createShellMaterial()
-
-        );
-
-        sphere.add(createGlow());
-        sphere.add(createHoloBase());
-
-        sphere.userData = {
+        node.userData = {
 
             ...project,
 
@@ -171,9 +155,9 @@ export function createProjectNodes(scene, aiCore) {
 
         };
 
-        scene.add(sphere);
+        scene.add(node);
 
-        spheres.push(sphere);
+        spheres.push(node);
 
     });
 
