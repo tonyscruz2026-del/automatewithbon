@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import { updateOrbit } from "../objects/orbitSystem.js";
 import { getCoreState } from "../objects/aiCoreStates.js";
+import { updateAiCoreNetwork } from "../objects/aiCoreNetwork.js";
 
 const clock = new THREE.Clock();
 
@@ -36,14 +37,11 @@ export function animate({
             : { mouseX: 0, mouseY: 0, scroll: 0 };
 
         //----------------------------------
-        // AI Core (image sprite)
-        // The sphere is now a billboarded <img>
-        // (see aiCore.js), so 3D .scale/.rotation
-        // on the group has no visual effect on it —
-        // the pulse is done directly on the image
-        // via CSS transform instead. Rotation is
-        // dropped entirely since a flat sprite has
-        // nothing to rotate.
+        // AI Core (real 3D geometry)
+        // group.scale/rotation now genuinely affect the sphere —
+        // it's a glass shell + lattice + inner glow, not a flat
+        // image, so the pulse/rotation below actually deform and
+        // spin real geometry rather than nudging a CSS transform.
         //----------------------------------
 
         const coreState = getCoreState(t);
@@ -52,12 +50,42 @@ export function animate({
 
             const parts = aiCore.userData || {};
 
-            if (parts.spriteImg) {
+            const pulse = 1 + Math.sin(t * 3) * 0.04 * coreState.emissive;
+            aiCore.scale.setScalar(pulse);
 
-                const pulse = 1 + Math.sin(t * 3) * 0.05 * coreState.emissive;
+            if (parts.shell) {
 
-                parts.spriteImg.style.transform =
-                    "scale(" + pulse + ")";
+                parts.shell.material.emissiveIntensity =
+                    0.25 + coreState.emissive * 0.25;
+
+                parts.shell.rotation.y = t * 0.05;
+
+            }
+
+            if (parts.atmosphere) {
+
+                parts.atmosphere.material.uniforms.intensity.value =
+                    0.55 + coreState.glow * 0.5;
+
+            }
+
+            if (parts.coreLight) {
+
+                parts.coreLight.intensity =
+                    7 + coreState.emissive * 9;
+
+            }
+
+            if (parts.inner) {
+
+                const innerPulse = 1 + Math.sin(t * 4) * 0.15 * coreState.emissive;
+                parts.inner.scale.setScalar(innerPulse);
+
+            }
+
+            if (parts.network) {
+
+                updateAiCoreNetwork(parts.network, t, coreState.network);
 
             }
 
