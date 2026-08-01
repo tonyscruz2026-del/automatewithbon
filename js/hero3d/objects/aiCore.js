@@ -53,26 +53,35 @@ export function createAiCore(scene) {
     group.add(shell);
 
     // =====================================
-    // Bright Inner Core
+    // Soft Inner Glow
+    // Small, dim, and semi-transparent —
+    // a "deep inner glow with volume" per the
+    // reference, not a solid bright lightbulb.
+    // Kept small so it sits behind the network
+    // lattice instead of overpowering it.
     // =====================================
 
     const innerGeometry = new THREE.SphereGeometry(
-        0.65,
-        128,
-        128
+        0.4,
+        64,
+        64
     );
 
     const innerMaterial = new THREE.MeshStandardMaterial({
 
-        color: 0xffffff,
+        color: 0x1a4d7a,
 
-        emissive: 0x66ddff,
+        emissive: 0x4fc3ff,
 
-        emissiveIntensity: 5,
+        emissiveIntensity: 1.2,
 
-        roughness: 0,
+        roughness: 0.3,
 
-        metalness: 0.2
+        metalness: 0,
+
+        transparent: true,
+
+        opacity: 0.55
 
     });
 
