@@ -33,7 +33,7 @@ const CORE_RADIUS = 1.0;
 
 // If the loaded model looks too big/small relative to the project
 // node spheres, tune this — it scales the whole GLB uniformly.
-const GLB_SCALE = 1.0;
+const GLB_SCALE = 2.2;
 
 const GLB_PATH = "assets/hero3d/ai_sphere.glb";
 
