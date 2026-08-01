@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import { updateOrbit } from "../objects/orbitSystem.js";
 import { getCoreState } from "../objects/aiCoreStates.js";
-import { updateAiCoreNetwork } from "../objects/aiCoreNetwork.js";
 
 const clock = new THREE.Clock();
 
@@ -37,11 +36,8 @@ export function animate({
             : { mouseX: 0, mouseY: 0, scroll: 0 };
 
         //----------------------------------
-        // AI Core (real 3D geometry)
-        // group.scale/rotation now genuinely affect the sphere —
-        // it's a glass shell + lattice + inner glow, not a flat
-        // image, so the pulse/rotation below actually deform and
-        // spin real geometry rather than nudging a CSS transform.
+        // AI Core (real 3D geometry, matcap-shaded
+        // with your actual reference art)
         //----------------------------------
 
         const coreState = getCoreState(t);
@@ -53,12 +49,16 @@ export function animate({
             const pulse = 1 + Math.sin(t * 3) * 0.04 * coreState.emissive;
             aiCore.scale.setScalar(pulse);
 
-            if (parts.shell) {
+            if (parts.sphere) {
 
-                parts.shell.material.emissiveIntensity =
-                    0.25 + coreState.emissive * 0.25;
+                // MatCap materials have no emissiveIntensity — pushing
+                // .color slightly above 1 brightens the sampled matcap
+                // pixels instead, which still feeds the bloom pass.
+                const glowBoost = 1 + coreState.emissive * 0.12;
 
-                parts.shell.rotation.y = t * 0.05;
+                parts.sphere.material.color.setScalar(glowBoost);
+
+                parts.sphere.rotation.y = t * 0.05;
 
             }
 
@@ -72,20 +72,7 @@ export function animate({
             if (parts.coreLight) {
 
                 parts.coreLight.intensity =
-                    7 + coreState.emissive * 9;
-
-            }
-
-            if (parts.inner) {
-
-                const innerPulse = 1 + Math.sin(t * 4) * 0.15 * coreState.emissive;
-                parts.inner.scale.setScalar(innerPulse);
-
-            }
-
-            if (parts.network) {
-
-                updateAiCoreNetwork(parts.network, t, coreState.network);
+                    6 + coreState.emissive * 8;
 
             }
 
