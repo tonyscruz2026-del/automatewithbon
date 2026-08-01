@@ -1,24 +1,75 @@
 import * as THREE from "three";
 
+const NODE_RADIUS = 0.52;
+
+// =========================================
+// Glass shell material — transparent + clearcoat
+// gives a hollow orb look without the render
+// cost of true transmission (kept cheap for
+// low-power laptops running this locally).
+// =========================================
+
+function createShellMaterial() {
+
+    return new THREE.MeshPhysicalMaterial({
+
+        color: 0x0d1b30,
+
+        transparent: true,
+
+        opacity: 0.5,
+
+        roughness: 0.15,
+
+        metalness: 0.05,
+
+        clearcoat: 1,
+
+        clearcoatRoughness: 0.08,
+
+        emissive: 0x1c7dff,
+
+        emissiveIntensity: 0.35,
+
+        side: THREE.DoubleSide
+
+    });
+
+}
+
+// =========================================
+// Soft outer rim glow (additive, back-facing)
+// =========================================
+
+function createGlow() {
+
+    const geometry = new THREE.SphereGeometry(
+        NODE_RADIUS * 1.22,
+        32,
+        32
+    );
+
+    const material = new THREE.MeshBasicMaterial({
+
+        color: 0x5fd4ff,
+
+        transparent: true,
+
+        opacity: 0.16,
+
+        side: THREE.BackSide,
+
+        depthWrite: false
+
+    });
+
+    return new THREE.Mesh(geometry, material);
+
+}
+
 export function createProjectNodes(scene, aiCore) {
 
     const spheres = [];
-
-    const nodeMaterial = new THREE.MeshPhysicalMaterial({
-
-        color: 0x182233,
-
-        emissive: 0x2aa8ff,
-
-        emissiveIntensity: 0.7,
-
-        metalness: 0.2,
-
-        roughness: 0.25,
-
-        transmission: 0.15
-
-    });
 
     const projects = [
 
@@ -58,11 +109,13 @@ export function createProjectNodes(scene, aiCore) {
 
         const sphere = new THREE.Mesh(
 
-            new THREE.SphereGeometry(0.45, 48, 48),
+            new THREE.SphereGeometry(NODE_RADIUS, 48, 48),
 
-            nodeMaterial.clone()
+            createShellMaterial()
 
         );
+
+        sphere.add(createGlow());
 
         sphere.userData = {
 
@@ -74,7 +127,12 @@ export function createProjectNodes(scene, aiCore) {
 
             offset: index * ((Math.PI * 2) / projects.length),
 
-            isProject: true
+            isProject: true,
+
+            // Used by the parallax layer to give each node a slightly
+            // different amount of mouse-driven drift, so the cluster
+            // reads as several depths instead of one flat plane.
+            depth: 0.35 + index * 0.1
 
         };
 
