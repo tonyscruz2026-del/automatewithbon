@@ -1,156 +1,67 @@
 import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
-import { createAiCoreNetwork } from "./aiCoreNetwork.js";
+// =========================================
+// AI Core
+//
+// HOW THIS WORKS (image-sprite technique):
+//
+// Instead of building the glass/glow look with a
+// WebGL shader, the reference design image itself
+// is used as the sphere. It's placed in a real DOM
+// <img>, wrapped in a CSS2DObject — the exact same
+// billboard technique already used for the "AI"
+// label and the holographic base rings. CSS2DObject
+// projects a 3D position onto the screen and moves a
+// real HTML element there every frame; it does NOT
+// touch WebGL rendering at all, which is why this
+// sidesteps every glass-shader problem from before.
+//
+// Two consequences worth knowing:
+// 1. Size is controlled entirely by CSS pixels (see
+//    .ai-core-sprite-wrap), NOT by 3D scale — a
+//    THREE.Object3D's .scale has no effect on a
+//    CSS2DObject's on-screen size, only its .position
+//    matters. That's also why the old pulse animation
+//    (aiCore.scale.setScalar) is gone below; the pulse
+//    is now done in animate.js via CSS transform on
+//    the <img> instead.
+// 2. The image's near-black background disappears via
+//    mix-blend-mode:screen in CSS (see hero3d.css) —
+//    black contributes nothing under "screen" blending,
+//    so it reads as transparent against the dark hero
+//    background with no manual masking needed.
+// =========================================
 
 export function createAiCore(scene) {
 
     const group = new THREE.Group();
 
     // =====================================
-    // Core Geometry
+    // Sphere Sprite
     // =====================================
 
-    const geometry = new THREE.SphereGeometry(
-        1.2,
-        128,
-        128
-    );
+    const wrap = document.createElement("div");
+    wrap.className = "ai-core-sprite-wrap";
 
-    // =====================================
-    // Glass Shell
-    // =====================================
+    const img = document.createElement("img");
+    img.className = "ai-core-sprite";
+    img.src = "assets/hero3d/ai-core.png";
+    img.alt = "";
 
-    const shellMaterial = new THREE.MeshPhysicalMaterial({
+    wrap.appendChild(img);
 
-        color: 0x39b8ff,
-
-        transparent: true,
-
-        opacity: 0.25,
-
-        roughness: 0,
-
-        metalness: 0,
-
-        transmission: 1,
-
-        thickness: 1.5,
-
-        ior: 1.5,
-
-        clearcoat: 1,
-
-        clearcoatRoughness: 0
-
-    });
-
-    const shell = new THREE.Mesh(
-        geometry,
-        shellMaterial
-    );
-
-    group.add(shell);
-
-    // =====================================
-    // Soft Inner Glow
-    // Small, dim, and semi-transparent —
-    // a "deep inner glow with volume" per the
-    // reference, not a solid bright lightbulb.
-    // Kept small so it sits behind the network
-    // lattice instead of overpowering it.
-    // =====================================
-
-    const innerGeometry = new THREE.SphereGeometry(
-        0.4,
-        64,
-        64
-    );
-
-    const innerMaterial = new THREE.MeshStandardMaterial({
-
-        color: 0x1a4d7a,
-
-        emissive: 0x4fc3ff,
-
-        emissiveIntensity: 1.2,
-
-        roughness: 0.3,
-
-        metalness: 0,
-
-        transparent: true,
-
-        opacity: 0.55
-
-    });
-
-    const inner = new THREE.Mesh(
-        innerGeometry,
-        innerMaterial
-    );
-
-    group.add(inner);
-
-    // =====================================
-    // Glow Sphere
-    // =====================================
-
-    const glowGeometry = new THREE.SphereGeometry(
-        1.35,
-        64,
-        64
-    );
-
-    const glowMaterial = new THREE.MeshBasicMaterial({
-
-        color: 0x29bfff,
-
-        transparent: true,
-
-        opacity: 0.12,
-
-        side: THREE.DoubleSide
-
-    });
-
-    const glow = new THREE.Mesh(
-        glowGeometry,
-        glowMaterial
-    );
-
-    group.add(glow);
-
-    // =====================================
-    // Inner Neural Network
-    // (Dynamic Neural Network Core)
-    // =====================================
-
-    const network = createAiCoreNetwork();
-    group.add(network);
-
-    // =====================================
-    // "AI" Label
-    // Flat, camera-facing, centered — same
-    // CSS2DObject technique as the project
-    // node icons, so it always reads crisp
-    // regardless of shell refraction.
-    // =====================================
-
-    const labelEl = document.createElement("div");
-    labelEl.className = "ai-core-label";
-    labelEl.textContent = "AI";
-
-    const label = new CSS2DObject(labelEl);
-    label.position.set(0, 0, 0);
-    group.add(label);
+    const sprite = new CSS2DObject(wrap);
+    sprite.position.set(0, 0, 0);
+    group.add(sprite);
 
     // =====================================
     // Focus Mode — vertical light beam
+    // Unchanged from before: this is real WebGL
+    // geometry (not part of the sphere image), still
+    // driven every frame from animate.js via the
+    // "beam" value from aiCoreStates.getCoreState().
     // Hidden (scale 0) outside Focus Mode.
-    // Driven every frame from animate.js via
-    // the "beam" value returned by
-    // aiCoreStates.getCoreState().
     // =====================================
 
     const beamGeometry = new THREE.CylinderGeometry(
@@ -178,8 +89,6 @@ export function createAiCore(scene) {
 
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
 
-    // Cylinder is built centered on its own origin; lift it so its
-    // base sits at the core's center and it extends upward.
     beam.position.y = 3;
     beam.scale.set(1, 0.0001, 1);
 
@@ -187,8 +96,7 @@ export function createAiCore(scene) {
 
     // =====================================
     // Holographic Base
-    // Flat ripple ring beneath the core,
-    // same billboard technique as the label.
+    // Unchanged — same billboard technique as before.
     // =====================================
 
     const baseEl = document.createElement("div");
@@ -202,13 +110,12 @@ export function createAiCore(scene) {
     base.position.set(0, -1.35, 0);
     group.add(base);
 
+    // spriteImg is what animate.js pulses on each frame — see the
+    // "spriteImg" block in the AI Core section of animate.js.
     group.userData = {
 
-        shell,
-        inner,
-        glow,
-        network,
-        beam
+        beam,
+        spriteImg: img
 
     };
 
