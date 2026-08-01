@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import { updateOrbit } from "../objects/orbitSystem.js";
 import { getCoreState } from "../objects/aiCoreStates.js";
-import { updateAiCoreNetwork } from "../objects/aiCoreNetwork.js";
 
 const clock = new THREE.Clock();
 
@@ -37,52 +36,28 @@ export function animate({
             : { mouseX: 0, mouseY: 0, scroll: 0 };
 
         //----------------------------------
-        // AI Core (shell / inner / glow)
-        // Base pulse/rotation is the original
-        // ambient motion; the dynamic-state
-        // multipliers from aiCoreStates.js
-        // scale on top of it, so Idle still
-        // looks like the original calm core
-        // and the other states build up from
-        // there rather than replacing it.
+        // AI Core (image sprite)
+        // The sphere is now a billboarded <img>
+        // (see aiCore.js), so 3D .scale/.rotation
+        // on the group has no visual effect on it —
+        // the pulse is done directly on the image
+        // via CSS transform instead. Rotation is
+        // dropped entirely since a flat sprite has
+        // nothing to rotate.
         //----------------------------------
 
         const coreState = getCoreState(t);
 
         if (aiCore) {
 
-            const pulse = 1 + Math.sin(t * 3) * 0.05 * coreState.emissive;
-
-            aiCore.scale.setScalar(pulse);
-
-            aiCore.rotation.y += 0.003 * coreState.rotation;
-            aiCore.rotation.x += 0.001 * coreState.rotation;
-
             const parts = aiCore.userData || {};
 
-            if (parts.glow) {
+            if (parts.spriteImg) {
 
-                parts.glow.scale.setScalar(
-                    1.05 + Math.sin(t * 3) * 0.08 * coreState.glow
-                );
+                const pulse = 1 + Math.sin(t * 3) * 0.05 * coreState.emissive;
 
-                parts.glow.material.opacity =
-                    (0.12 +
-                    Math.sin(t * 3) * 0.05) * coreState.glow;
-
-            }
-
-            if (parts.inner && parts.inner.material.emissiveIntensity !== undefined) {
-
-                parts.inner.material.emissiveIntensity =
-                    (5 +
-                    Math.sin(t * 3) * 1.2) * coreState.emissive;
-
-            }
-
-            if (parts.network) {
-
-                updateAiCoreNetwork(parts.network, t, coreState.network);
+                parts.spriteImg.style.transform =
+                    "scale(" + pulse + ")";
 
             }
 
