@@ -5,7 +5,6 @@ import { createCamera } from "./core/camera.js";
 import { createRenderer } from "./core/renderer.js";
 import { setupResize } from "./core/resize.js";
 import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 import { createLights } from "./world/lights.js";
 import { createStars } from "./world/stars.js";
@@ -42,16 +41,6 @@ function init() {
     const camera = createCamera();
 
     const renderer = createRenderer(canvas);
-
-    // Glass shells (aiCore, projectNode) use MeshPhysicalMaterial with
-    // transmission — without an environment to reflect, transmission
-    // materials render flat. RoomEnvironment is a procedural three.js
-    // scene (soft studio panels), so this needs no external HDRI asset.
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmremGenerator.fromScene(
-        new RoomEnvironment(),
-        0.04
-    ).texture;
 
     createLights(scene);
 
