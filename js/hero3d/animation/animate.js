@@ -12,7 +12,8 @@ export function animate({
     camera,
     controls,
     aiCore,
-    projectNodes
+    projectNodes,
+    labelRenderer
 
 }) {
 
@@ -109,6 +110,16 @@ export function animate({
         } else {
 
             renderer.render(scene, camera);
+
+        }
+
+        //----------------------------------
+        // Labels
+        //----------------------------------
+
+        if (labelRenderer) {
+
+            labelRenderer.render(scene, camera);
 
         }
 
