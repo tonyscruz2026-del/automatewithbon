@@ -1,0 +1,305 @@
+/* ===========================
+   RESET
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+    overflow:hidden;
+
+    font-family:"Inter", sans-serif;
+
+    background:#05070d;
+    color:white;
+
+}
+
+/* ===========================
+   HERO
+=========================== */
+
+.hero{
+
+    position:relative;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+/* ===========================
+   THREEJS CANVAS
+=========================== */
+
+#heroCanvas{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    display:block;
+
+    z-index:1;
+
+    cursor:grab;
+
+}
+
+#heroCanvas:active{
+
+    cursor:grabbing;
+
+}
+
+/* ===========================
+   GRADIENT
+=========================== */
+
+.hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+    radial-gradient(
+        circle at top,
+        rgba(40,80,255,.25),
+        transparent 55%
+    ),
+
+    radial-gradient(
+        circle at bottom,
+        rgba(0,180,255,.12),
+        transparent 60%
+    );
+
+    z-index:2;
+
+    pointer-events:none;
+
+}
+
+/* ===========================
+   HERO CONTENT
+=========================== */
+
+.hero-content{
+
+    position:relative;
+
+    z-index:5;
+
+    max-width:900px;
+
+    text-align:center;
+
+    padding:40px;
+
+    /* Allow mouse to reach the canvas */
+    pointer-events:none;
+
+}
+
+/* ===========================
+   EYEBROW
+=========================== */
+
+.eyebrow{
+
+    display:inline-block;
+
+    color:#63b8ff;
+
+    letter-spacing:4px;
+
+    font-size:.8rem;
+
+    margin-bottom:25px;
+
+    text-transform:uppercase;
+
+}
+
+/* ===========================
+   TITLE
+=========================== */
+
+.hero h1{
+
+    font-size:72px;
+
+    font-weight:800;
+
+    line-height:1.1;
+
+    margin-bottom:25px;
+
+}
+
+.hero h1 span{
+
+    color:#2aa8ff;
+
+}
+
+/* ===========================
+   SUBTITLE
+=========================== */
+
+.hero p{
+
+    max-width:700px;
+
+    margin:auto;
+
+    color:#c7d0e5;
+
+    font-size:20px;
+
+    line-height:1.7;
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.hero-buttons{
+
+    margin-top:45px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    pointer-events:auto;
+
+}
+
+.hero-buttons a{
+
+    text-decoration:none;
+
+    padding:18px 34px;
+
+    border-radius:12px;
+
+    transition:.35s;
+
+    pointer-events:auto;
+
+}
+
+/* ===========================
+   PRIMARY BUTTON
+=========================== */
+
+.primary{
+
+    background:#2d7dff;
+
+    color:white;
+
+    font-weight:700;
+
+}
+
+.primary:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 0 35px
+    rgba(45,125,255,.45);
+
+}
+
+/* ===========================
+   SECONDARY BUTTON
+=========================== */
+
+.secondary{
+
+    border:1px solid rgba(255,255,255,.15);
+
+    color:white;
+
+    backdrop-filter:blur(18px);
+
+    background:rgba(255,255,255,.05);
+
+}
+
+.secondary:hover{
+
+    background:rgba(255,255,255,.10);
+
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:900px){
+
+.hero h1{
+
+font-size:48px;
+
+}
+
+.hero p{
+
+font-size:18px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.hero h1{
+
+font-size:38px;
+
+}
+
+.hero-content{
+
+padding:20px;
+
+}
+
+.hero-buttons{
+
+flex-direction:column;
+align-items:center;
+
+}
+
+}
