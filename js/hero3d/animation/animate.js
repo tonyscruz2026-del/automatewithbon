@@ -1,5 +1,7 @@
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
+import { updateOrbit } from "../systems/orbit.js";
+
 const clock = new THREE.Clock();
 
 export function animate({
@@ -21,79 +23,63 @@ export function animate({
         const t = clock.getElapsedTime();
 
         //----------------------------------
-        // Center AI Sphere
+        // Center AI Core
         //----------------------------------
 
         const center = spheres[0];
 
-        const pulse = 1 + Math.sin(t * 3) * 0.05;
+        if (center) {
 
-        center.scale.setScalar(1.7 * pulse);
+            const pulse = 1 + Math.sin(t * 3) * 0.05;
 
-        center.rotation.y += 0.003;
+            center.scale.setScalar(1.7 * pulse);
 
-        if (center.userData.glow) {
+            center.rotation.y += 0.003;
+            center.rotation.x += 0.001;
 
-            center.userData.glow.scale.setScalar(
+            if (center.userData.glow) {
 
-                1.05 + Math.sin(t * 3) * 0.08
+                center.userData.glow.scale.setScalar(
 
-            );
+                    1.05 + Math.sin(t * 3) * 0.08
 
-            center.userData.glow.material.opacity =
+                );
 
-                0.08 +
+                center.userData.glow.material.opacity =
 
-                Math.sin(t * 3) * 0.05;
+                    0.08 +
 
-        }
+                    Math.sin(t * 3) * 0.05;
 
-        if (center.material.emissiveIntensity !== undefined) {
+            }
 
-            center.material.emissiveIntensity =
+            if (center.material.emissiveIntensity !== undefined) {
 
-                2.2 +
+                center.material.emissiveIntensity =
 
-                Math.sin(t * 3) * 0.8;
+                    2.2 +
+
+                    Math.sin(t * 3) * 0.8;
+
+            }
 
         }
 
         //----------------------------------
-        // Orbiting Spheres
+        // Orbit System
         //----------------------------------
 
-        const radius = 3;
+        updateOrbit(spheres, t);
+
+        //----------------------------------
+        // Rotate Project Spheres
+        //----------------------------------
 
         for (let i = 1; i < spheres.length; i++) {
 
             const sphere = spheres[i];
 
-            const angle =
-
-                t * 0.45 +
-
-                (Math.PI * 2 / (spheres.length - 1)) * (i - 1);
-
-            sphere.position.x =
-
-                center.position.x +
-
-                Math.cos(angle) * radius;
-
-            sphere.position.z =
-
-                center.position.z +
-
-                Math.sin(angle) * radius;
-
-            sphere.position.y =
-
-                center.position.y +
-
-                Math.sin(t * 2 + i) * 0.25;
-
             sphere.rotation.y += 0.01;
-
             sphere.rotation.x += 0.005;
 
         }
@@ -114,7 +100,11 @@ export function animate({
         // Controls
         //----------------------------------
 
-        controls.update();
+        if (controls) {
+
+            controls.update();
+
+        }
 
         //----------------------------------
         // Render
