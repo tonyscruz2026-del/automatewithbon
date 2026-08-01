@@ -1,31 +1,34 @@
 import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { createAiCoreNetwork } from "./aiCoreNetwork.js";
 
 // =========================================
 // AI Core
 //
-// Real WebGL geometry, built in layers (same idea as the
-// reference design, recreated as actual 3D objects instead
-// of a flattened photo pasted on a billboard):
+// HOW THIS WORKS (matcap technique):
 //
-//   1. Atmosphere  — oversized backside sphere, fresnel rim
-//                    glow, additive blending. Reads as the
-//                    soft haze around the orb.
-//   2. Glass shell — MeshPhysicalMaterial sphere with real
-//                    transmission/iridescence, so it actually
-//                    refracts scene light like glass.
-//   3. Inner core  — small bright sphere at the center; this
-//                    is what bloom picks up as the hot glow.
-//   4. Lattice     — the geodesic wireframe network already
-//                    built in aiCoreNetwork.js (was defined
-//                    but never wired into the scene before).
-//   5. Core light  — a real PointLight living inside the
-//                    sphere so the shell/lattice/nearby nodes
-//                    catch true light, not just emissive color.
+// Your actual reference art (assets/hero3d/ai-core.png) is used
+// as a MatCap texture on a REAL THREE.SphereGeometry — not a flat
+// billboard. A matcap shades a mesh by sampling the texture based
+// on the surface's normal direction relative to the camera, the
+// same way a photo of a chrome ball under studio lighting can be
+// used to "re-light" any 3D object. That's what makes this look
+// exactly like the source image while still being genuine 3D:
 //
-// Because this is now genuine geometry, group.scale / rotation
-// actually do something again — see animate.js.
+//   - It's a real THREE.Mesh with real geometry: it has depth,
+//     casts/receives correctly in the scene, and sits properly
+//     among the other 3D objects (nodes, beam, lights).
+//   - Parallax, camera dolly, and orbiting nodes passing in front
+//     of/behind it all work correctly, because it's positioned in
+//     actual 3D space, not projected as a 2D screen-space sprite.
+//   - The surface shading itself is pulled directly from your art,
+//     so the glow/network/color read exactly like the reference —
+//     no hand-guessed shader trying to reinvent the look.
+//
+// One real property of matcaps worth knowing: because the shading
+// is camera-relative, spinning the sphere in place doesn't change
+// its lit look much (same as how a mirrored ball looks the same
+// no matter how it spins in a fixed room) — depth, glow pulse, and
+// parallax movement all still read as fully 3D.
 // =========================================
 
 const CORE_RADIUS = 1.0;
@@ -53,11 +56,13 @@ export function createAiCore(scene) {
     const group = new THREE.Group();
 
     // =====================================
-    // Atmosphere — soft outer glow
+    // Atmosphere — soft outer glow halo,
+    // matching the bloom/glow ring around the
+    // sphere in the reference image.
     // =====================================
 
     const atmosphereGeometry = new THREE.SphereGeometry(
-        CORE_RADIUS * 1.4,
+        CORE_RADIUS * 1.35,
         48,
         48
     );
@@ -65,7 +70,7 @@ export function createAiCore(scene) {
     const atmosphereMaterial = new THREE.ShaderMaterial({
 
         uniforms: {
-            glowColor: { value: new THREE.Color(0x4fc3ff) },
+            glowColor: { value: new THREE.Color(0x5fc9ff) },
             intensity: { value: 1.0 }
         },
 
@@ -83,64 +88,31 @@ export function createAiCore(scene) {
     group.add(atmosphere);
 
     // =====================================
-    // Glass shell — real transmission, not a texture
+    // The sphere itself — real geometry, shaded
+    // with your actual reference art as a matcap.
     // =====================================
 
-    const shellGeometry = new THREE.SphereGeometry(CORE_RADIUS, 96, 96);
+    const matcapTexture = new THREE.TextureLoader().load(
+        "assets/hero3d/ai-core.png"
+    );
+    matcapTexture.colorSpace = THREE.SRGBColorSpace;
 
-    const shellMaterial = new THREE.MeshPhysicalMaterial({
+    const sphereGeometry = new THREE.SphereGeometry(CORE_RADIUS, 96, 96);
 
-        color: 0x1c3f78,
-
-        transmission: 0.85,
-        thickness: 1.4,
-        roughness: 0.1,
-        metalness: 0,
-        ior: 1.35,
-
-        clearcoat: 0.6,
-        clearcoatRoughness: 0.2,
-
-        iridescence: 0.5,
-        iridescenceIOR: 1.3,
-
-        emissive: 0x1a5fd6,
-        emissiveIntensity: 0.35,
-
-        transparent: true,
-        opacity: 0.9
-
+    const sphereMaterial = new THREE.MeshMatcapMaterial({
+        matcap: matcapTexture
     });
 
-    const shell = new THREE.Mesh(shellGeometry, shellMaterial);
-    group.add(shell);
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    group.add(sphere);
 
     // =====================================
-    // Inner core — bright hot center, bloom's target
+    // Core light — real light living inside the
+    // sphere so nearby project nodes and the
+    // lattice/beam catch true illumination from it.
     // =====================================
 
-    const innerGeometry = new THREE.SphereGeometry(CORE_RADIUS * 0.3, 32, 32);
-
-    const innerMaterial = new THREE.MeshBasicMaterial({
-        color: 0xdff6ff
-    });
-
-    const inner = new THREE.Mesh(innerGeometry, innerMaterial);
-    group.add(inner);
-
-    // =====================================
-    // Neural lattice — real geodesic wireframe
-    // (already built in aiCoreNetwork.js; just needed wiring)
-    // =====================================
-
-    const network = createAiCoreNetwork();
-    group.add(network);
-
-    // =====================================
-    // Core light — lights the shell/lattice/nearby nodes for real
-    // =====================================
-
-    const coreLight = new THREE.PointLight(0x6fd6ff, 10, 7);
+    const coreLight = new THREE.PointLight(0x6fd6ff, 8, 7);
     coreLight.position.set(0, 0, 0);
     group.add(coreLight);
 
@@ -201,9 +173,7 @@ export function createAiCore(scene) {
 
         beam,
         atmosphere,
-        shell,
-        inner,
-        network,
+        sphere,
         coreLight
 
     };
