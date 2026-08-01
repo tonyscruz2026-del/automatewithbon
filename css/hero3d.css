@@ -428,3 +428,43 @@ align-items:center;
         border-top:1px solid rgba(42,168,255,0.25);
     }
 }
+
+/* ===========================
+   NODE HOVER TOOLTIP
+=========================== */
+
+.node-tooltip{
+    position:fixed;
+    top:0;
+    left:0;
+
+    transform:translate(-9999px, -9999px);
+
+    background:rgba(5,7,13,0.9);
+    border:1px solid rgba(42,168,255,0.4);
+    border-radius:8px;
+
+    padding:0.5rem 0.9rem;
+
+    font-family:"Inter", sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    color:white;
+    white-space:nowrap;
+
+    pointer-events:none;
+    z-index:40;
+
+    opacity:0;
+    transition:opacity 0.15s ease;
+}
+
+.node-tooltip.is-visible{
+    opacity:1;
+}
+
+@media (hover: none){
+    .node-tooltip{
+        display:none;
+    }
+}
