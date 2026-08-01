@@ -1,34 +1,8 @@
 import * as THREE from "three";
 
-export function createSpheres(scene) {
+export function createProjectNodes(scene, aiCore) {
 
     const spheres = [];
-
-    // =====================================
-    // Materials
-    // =====================================
-
-    const coreMaterial = new THREE.MeshPhysicalMaterial({
-
-        color: 0x3ab8ff,
-
-        emissive: 0x19b5fe,
-
-        emissiveIntensity: 2.5,
-
-        metalness: 0,
-
-        roughness: 0,
-
-        transmission: 1,
-
-        thickness: 1.5,
-
-        transparent: true,
-
-        opacity: 0.95
-
-    });
 
     const nodeMaterial = new THREE.MeshPhysicalMaterial({
 
@@ -45,54 +19,6 @@ export function createSpheres(scene) {
         transmission: 0.15
 
     });
-
-    // =====================================
-    // AI Core
-    // =====================================
-
-    const core = new THREE.Mesh(
-
-        new THREE.SphereGeometry(1.15, 64, 64),
-
-        coreMaterial
-
-    );
-
-    core.userData.isCore = true;
-
-    scene.add(core);
-
-    spheres.push(core);
-
-    // =====================================
-    // Glow Shell
-    // =====================================
-
-    const glow = new THREE.Mesh(
-
-        new THREE.SphereGeometry(1.45, 64, 64),
-
-        new THREE.MeshBasicMaterial({
-
-            color: 0x19b5fe,
-
-            transparent: true,
-
-            opacity: 0.18,
-
-            side: THREE.DoubleSide
-
-        })
-
-    );
-
-    scene.add(glow);
-
-    core.userData.glow = glow;
-
-    // =====================================
-    // Projects
-    // =====================================
 
     const projects = [
 
@@ -128,10 +54,6 @@ export function createSpheres(scene) {
 
     ];
 
-    // =====================================
-    // Orbit Nodes
-    // =====================================
-
     projects.forEach((project, index) => {
 
         const sphere = new THREE.Mesh(
@@ -162,11 +84,11 @@ export function createSpheres(scene) {
 
     });
 
-    // =====================================
-    // Initial Orbit Placement
-    // =====================================
+    const centerX = aiCore ? aiCore.position.x : 0;
+    const centerY = aiCore ? aiCore.position.y : 0;
+    const centerZ = aiCore ? aiCore.position.z : 0;
 
-    for (let i = 1; i < spheres.length; i++) {
+    for (let i = 0; i < spheres.length; i++) {
 
         const s = spheres[i];
 
@@ -174,11 +96,11 @@ export function createSpheres(scene) {
 
         s.position.set(
 
-            Math.cos(angle) * s.userData.radius,
+            centerX + Math.cos(angle) * s.userData.radius,
 
-            0,
+            centerY,
 
-            Math.sin(angle) * s.userData.radius
+            centerZ + Math.sin(angle) * s.userData.radius
 
         );
 
