@@ -1,0 +1,470 @@
+/* ===========================
+   RESET
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+    overflow:hidden;
+
+    font-family:"Inter", sans-serif;
+
+    background:#05070d;
+    color:white;
+
+}
+
+/* ===========================
+   HERO
+=========================== */
+
+.hero{
+
+    position:relative;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+/* ===========================
+   THREEJS CANVAS
+=========================== */
+
+#heroCanvas{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    display:block;
+
+    z-index:1;
+
+    cursor:grab;
+
+}
+
+#heroCanvas:active{
+
+    cursor:grabbing;
+
+}
+
+/* ===========================
+   GRADIENT
+=========================== */
+
+.hero::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+    radial-gradient(
+        circle at top,
+        rgba(40,80,255,.25),
+        transparent 55%
+    ),
+
+    radial-gradient(
+        circle at bottom,
+        rgba(0,180,255,.12),
+        transparent 60%
+    );
+
+    z-index:2;
+
+    pointer-events:none;
+
+}
+
+/* ===========================
+   HERO CONTENT
+=========================== */
+
+.hero-content{
+
+    position:relative;
+
+    z-index:5;
+
+    max-width:900px;
+
+    text-align:center;
+
+    padding:40px;
+
+    /* Allow mouse to reach the canvas */
+    pointer-events:none;
+
+}
+
+/* ===========================
+   EYEBROW
+=========================== */
+
+.eyebrow{
+
+    display:inline-block;
+
+    color:#63b8ff;
+
+    letter-spacing:4px;
+
+    font-size:.8rem;
+
+    margin-bottom:25px;
+
+    text-transform:uppercase;
+
+}
+
+/* ===========================
+   TITLE
+=========================== */
+
+.hero h1{
+
+    font-size:72px;
+
+    font-weight:800;
+
+    line-height:1.1;
+
+    margin-bottom:25px;
+
+}
+
+.hero h1 span{
+
+    color:#2aa8ff;
+
+}
+
+/* ===========================
+   SUBTITLE
+=========================== */
+
+.hero p{
+
+    max-width:700px;
+
+    margin:auto;
+
+    color:#c7d0e5;
+
+    font-size:20px;
+
+    line-height:1.7;
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.hero-buttons{
+
+    margin-top:45px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    pointer-events:auto;
+
+}
+
+.hero-buttons a{
+
+    text-decoration:none;
+
+    padding:18px 34px;
+
+    border-radius:12px;
+
+    transition:.35s;
+
+    pointer-events:auto;
+
+}
+
+/* ===========================
+   PRIMARY BUTTON
+=========================== */
+
+.primary{
+
+    background:#2d7dff;
+
+    color:white;
+
+    font-weight:700;
+
+}
+
+.primary:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 0 35px
+    rgba(45,125,255,.45);
+
+}
+
+/* ===========================
+   SECONDARY BUTTON
+=========================== */
+
+.secondary{
+
+    border:1px solid rgba(255,255,255,.15);
+
+    color:white;
+
+    backdrop-filter:blur(18px);
+
+    background:rgba(255,255,255,.05);
+
+}
+
+.secondary:hover{
+
+    background:rgba(255,255,255,.10);
+
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:900px){
+
+.hero h1{
+
+font-size:48px;
+
+}
+
+.hero p{
+
+font-size:18px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.hero h1{
+
+font-size:38px;
+
+}
+
+.hero-content{
+
+padding:20px;
+
+}
+
+.hero-buttons{
+
+flex-direction:column;
+align-items:center;
+
+}
+
+}
+
+/* ===========================
+   PROJECT INFO PANEL
+=========================== */
+
+.project-panel{
+
+    position:fixed;
+    top:0;
+    right:0;
+
+    width:min(380px, 88vw);
+    height:100%;
+
+    background:rgba(5,7,13,0.92);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+
+    border-left:1px solid rgba(42,168,255,0.25);
+    box-shadow:-20px 0 60px rgba(0,0,0,0.5);
+
+    padding:2.4rem 2rem;
+
+    display:flex;
+    flex-direction:column;
+
+    z-index:50;
+
+    transform:translateX(100%);
+    opacity:0;
+    pointer-events:none;
+
+    transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+}
+
+.project-panel.is-open{
+    transform:translateX(0);
+    opacity:1;
+    pointer-events:auto;
+}
+
+.project-panel-close{
+    align-self:flex-end;
+
+    width:32px;
+    height:32px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#c7d0e5;
+
+    font-size:1.2rem;
+    line-height:1;
+
+    cursor:pointer;
+
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.project-panel-close:hover{
+    background:rgba(42,168,255,0.15);
+    border-color:#2aa8ff;
+    color:#63b8ff;
+}
+
+.project-panel-eyebrow{
+    display:block;
+
+    margin-top:1.6rem;
+
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#2aa8ff;
+    font-weight:600;
+}
+
+.project-panel-title{
+    margin-top:0.5rem;
+    margin-bottom:0.9rem;
+
+    font-size:1.5rem;
+    font-weight:700;
+
+    color:white;
+}
+
+.project-panel-desc{
+    color:#c7d0e5;
+    font-size:0.95rem;
+    line-height:1.6;
+
+    flex-grow:1;
+}
+
+.project-panel-link{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+
+    margin-top:1.4rem;
+
+    color:#2aa8ff;
+    text-decoration:none;
+
+    font-size:0.9rem;
+    font-weight:600;
+
+    transition:color 0.15s ease, gap 0.15s ease;
+}
+
+.project-panel-link:hover{
+    color:#63b8ff;
+    gap:0.6rem;
+}
+
+@media (max-width: 640px){
+    .project-panel{
+        width:100%;
+        border-left:none;
+        border-top:1px solid rgba(42,168,255,0.25);
+    }
+}
+
+/* ===========================
+   NODE HOVER TOOLTIP
+=========================== */
+
+.node-tooltip{
+    position:fixed;
+    top:0;
+    left:0;
+
+    transform:translate(-9999px, -9999px);
+
+    background:rgba(5,7,13,0.9);
+    border:1px solid rgba(42,168,255,0.4);
+    border-radius:8px;
+
+    padding:0.5rem 0.9rem;
+
+    font-family:"Inter", sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    color:white;
+    white-space:nowrap;
+
+    pointer-events:none;
+    z-index:40;
+
+    opacity:0;
+    transition:opacity 0.15s ease;
+}
+
+.node-tooltip.is-visible{
+    opacity:1;
+}
+
+@media (hover: none){
+    .node-tooltip{
+        display:none;
+    }
+}
