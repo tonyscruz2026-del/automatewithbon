@@ -1,4 +1,4 @@
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
 import { updateOrbit } from "../objects/orbitSystem.js";
 
@@ -11,8 +11,8 @@ export function animate({
     scene,
     camera,
     controls,
-    spheres,
-    particles
+    aiCore,
+    projectNodes
 
 }) {
 
@@ -23,43 +23,43 @@ export function animate({
         const t = clock.getElapsedTime();
 
         //----------------------------------
-        // Center AI Core
+        // AI Core (shell / inner / glow)
         //----------------------------------
 
-        const center = spheres[0];
-
-        if (center) {
+        if (aiCore) {
 
             const pulse = 1 + Math.sin(t * 3) * 0.05;
 
-            center.scale.setScalar(1.7 * pulse);
+            aiCore.scale.setScalar(pulse);
 
-            center.rotation.y += 0.003;
-            center.rotation.x += 0.001;
+            aiCore.rotation.y += 0.003;
+            aiCore.rotation.x += 0.001;
 
-            if (center.userData.glow) {
+            const parts = aiCore.userData || {};
 
-                center.userData.glow.scale.setScalar(
+            if (parts.glow) {
+
+                parts.glow.scale.setScalar(
 
                     1.05 + Math.sin(t * 3) * 0.08
 
                 );
 
-                center.userData.glow.material.opacity =
+                parts.glow.material.opacity =
 
-                    0.08 +
+                    0.12 +
 
                     Math.sin(t * 3) * 0.05;
 
             }
 
-            if (center.material.emissiveIntensity !== undefined) {
+            if (parts.inner && parts.inner.material.emissiveIntensity !== undefined) {
 
-                center.material.emissiveIntensity =
+                parts.inner.material.emissiveIntensity =
 
-                    2.2 +
+                    5 +
 
-                    Math.sin(t * 3) * 0.8;
+                    Math.sin(t * 3) * 1.2;
 
             }
 
@@ -69,30 +69,22 @@ export function animate({
         // Orbit System
         //----------------------------------
 
-        updateOrbit(spheres, t);
+        updateOrbit(projectNodes, aiCore, t);
 
         //----------------------------------
         // Rotate Project Spheres
         //----------------------------------
 
-        for (let i = 1; i < spheres.length; i++) {
+        if (projectNodes) {
 
-            const sphere = spheres[i];
+            for (let i = 0; i < projectNodes.length; i++) {
 
-            sphere.rotation.y += 0.01;
-            sphere.rotation.x += 0.005;
+                const sphere = projectNodes[i];
 
-        }
+                sphere.rotation.y += 0.01;
+                sphere.rotation.x += 0.005;
 
-        //----------------------------------
-        // Particles
-        //----------------------------------
-
-        if (particles) {
-
-            particles.rotation.y += 0.00035;
-            particles.rotation.x += 0.00008;
-            particles.rotation.z += 0.00012;
+            }
 
         }
 
