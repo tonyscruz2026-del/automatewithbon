@@ -8,18 +8,14 @@ const CAP_ANGLE = Math.PI * 0.47; // slightly under a full hemisphere — same t
 const GLB_PATH = "assets/hero3d/ai_sphere.glb";
 
 // aiCore.js authors its model at CORE_RADIUS (1.0) with its own
-// GLB_SCALE (currently 1.15). We don't import that file's internals
-// here, so this ratio just reproduces the same relative sizing: the
-// model scaled down proportionally to NODE_RADIUS instead of the
-// core's full size. If it looks off once loaded, this is the number
-// to tune (independently of aiCore.js's own GLB_SCALE).
+// GLB_SCALE (currently 1.15). This ratio just reproduces the same
+// relative sizing for nodes. If the sphere itself looks too big/small
+// once loaded, this is the number to tune.
 const CORE_RADIUS_REFERENCE = 1.0;
 const CORE_GLB_SCALE_REFERENCE = 1.15;
 const NODE_GLB_SCALE =
     CORE_GLB_SCALE_REFERENCE * (NODE_RADIUS / CORE_RADIUS_REFERENCE);
 
-// One reference-design node icon per project, in the same order as
-// the projects array below.
 const NODE_IMAGES = [
 
     "assets/hero3d/node-lead.png",       // Messenger AI
@@ -29,11 +25,6 @@ const NODE_IMAGES = [
     "assets/hero3d/node-booking.png"     // Workflow Builder
 
 ];
-
-// =========================================
-// Shared GLB load — loaded once, then cloned per node, instead of
-// re-fetching the same file five times.
-// =========================================
 
 let sharedGltfPromise = null;
 
@@ -53,14 +44,6 @@ function loadSharedCoreModel() {
 
 }
 
-// =========================================
-// Invisible hit-target — kept as a real Mesh (not a Group) so
-// raycaster.js's intersectObjects(projectNodes) keeps working exactly
-// as before, regardless of whether it's called with the recursive
-// flag or not. The GLB clone and icon panel are added as children on
-// top of this for the visible/clickable-looking part.
-// =========================================
-
 function createHitTarget() {
 
     const geometry = new THREE.SphereGeometry(NODE_RADIUS, 24, 24);
@@ -78,54 +61,9 @@ function createHitTarget() {
 }
 
 // =========================================
-// Cloned AI-core model, scaled down to node size. Async — if it
-// hasn't finished loading yet, the node is still fully clickable
-// (the invisible hit-target above already exists), it just doesn't
-// have its glass-sphere visual until this resolves.
-// =========================================
-
-function attachClonedCoreModel(node) {
-
-    loadSharedCoreModel()
-        .then((gltf) => {
-
-            const model = gltf.scene.clone(true);
-            model.scale.setScalar(NODE_GLB_SCALE);
-
-            node.add(model);
-
-        })
-        .catch((err) => {
-
-            console.warn(
-                "Node GLB failed to load, falling back to a plain glass sphere.",
-                err
-            );
-
-            const fallbackGeometry = new THREE.SphereGeometry(NODE_RADIUS, 32, 32);
-
-            const fallbackMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x11244a,
-                transmission: 0.5,
-                thickness: 0.8,
-                roughness: 0.22,
-                ior: 1.3,
-                emissive: 0x0c3d7a,
-                emissiveIntensity: 0.55,
-                transparent: true,
-                opacity: 0.95
-            });
-
-            node.add(new THREE.Mesh(fallbackGeometry, fallbackMaterial));
-
-        });
-
-}
-
-// =========================================
-// Icon panel — the same fused, undistorted-projection cap technique
-// as before, giving each node its own project icon regardless of
-// which model the glass sphere itself is using underneath.
+// Icon panel — now takes the RADIUS as a parameter instead of always
+// assuming NODE_RADIUS, so it can be sized to match whatever the
+// model's actual measured bounding sphere turns out to be.
 // =========================================
 
 function buildFrontPanelGeometry(radius, capAngle) {
@@ -171,12 +109,12 @@ function buildFrontPanelGeometry(radius, capAngle) {
 
 }
 
-function createIconPanel(imageSrc) {
+function createIconPanel(imageSrc, radius) {
 
     const panelTexture = new THREE.TextureLoader().load(imageSrc);
     panelTexture.colorSpace = THREE.SRGBColorSpace;
 
-    const panelGeometry = buildFrontPanelGeometry(NODE_RADIUS, CAP_ANGLE);
+    const panelGeometry = buildFrontPanelGeometry(radius, CAP_ANGLE);
 
     const panelMaterial = new THREE.MeshBasicMaterial({
 
@@ -191,8 +129,79 @@ function createIconPanel(imageSrc) {
 }
 
 // =========================================
-// Holographic base — unchanged from before.
+// Model + icon, fused together correctly.
+//
+// THE FIX: previously the icon panel was built up front assuming the
+// GLB model sits centered at the node's local origin with radius
+// NODE_RADIUS — but a loaded model almost always has its own internal
+// pivot/offset baked in from however it was exported (Blender, etc.),
+// so that assumption was wrong, which is why the icon was floating
+// beside the sphere instead of sitting flush on its face.
+//
+// Now: wait for the model to actually load, measure its REAL bounding
+// sphere (new THREE.Box3().setFromObject(model).getBoundingSphere()),
+// then build the icon panel to match that measured radius, and
+// position it at that measured center. The panel is also parented
+// directly to the model (not the outer node) so it automatically
+// inherits whatever that internal offset is.
 // =========================================
+
+function attachModelAndIcon(node, imageSrc) {
+
+    loadSharedCoreModel()
+        .then((gltf) => {
+
+            const model = gltf.scene.clone(true);
+            model.scale.setScalar(NODE_GLB_SCALE);
+
+            node.add(model);
+
+            const box = new THREE.Box3().setFromObject(model);
+            const boundingSphere = new THREE.Sphere();
+            box.getBoundingSphere(boundingSphere);
+
+            const panel = createIconPanel(imageSrc, boundingSphere.radius);
+            panel.position.copy(boundingSphere.center);
+
+            // Parented to the model itself, not the outer node — so
+            // if the model has any internal rotation/offset, the icon
+            // rides along with it automatically.
+            model.add(panel);
+
+        })
+        .catch((err) => {
+
+            console.warn(
+                "Node GLB failed to load, falling back to a plain glass sphere.",
+                err
+            );
+
+            const fallbackGeometry = new THREE.SphereGeometry(NODE_RADIUS, 32, 32);
+
+            const fallbackMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x11244a,
+                transmission: 0.5,
+                thickness: 0.8,
+                roughness: 0.22,
+                ior: 1.3,
+                emissive: 0x0c3d7a,
+                emissiveIntensity: 0.55,
+                transparent: true,
+                opacity: 0.95
+            });
+
+            const fallbackSphere = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+            node.add(fallbackSphere);
+
+            // The fallback IS the plain procedural sphere centered at
+            // origin, so the original NODE_RADIUS assumption is
+            // correct here.
+            const panel = createIconPanel(imageSrc, NODE_RADIUS);
+            fallbackSphere.add(panel);
+
+        });
+
+}
 
 function createHoloBase() {
 
@@ -251,8 +260,7 @@ export function createProjectNodes(scene, aiCore) {
 
         const node = createHitTarget();
 
-        attachClonedCoreModel(node);
-        node.add(createIconPanel(NODE_IMAGES[index % NODE_IMAGES.length]));
+        attachModelAndIcon(node, NODE_IMAGES[index % NODE_IMAGES.length]);
         node.add(createHoloBase());
 
         node.userData = {
