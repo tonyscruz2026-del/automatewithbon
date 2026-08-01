@@ -1,12 +1,17 @@
 import * as THREE from "three";
+import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
 const NODE_RADIUS = 0.52;
 
 // =========================================
-// Glass shell material — transparent + clearcoat
-// gives a hollow orb look without the render
-// cost of true transmission (kept cheap for
-// low-power laptops running this locally).
+// Glass shell material — real transmission
+// refraction (matches the AI core's shell),
+// replacing the old flat transparent+opacity
+// look with actual "Glossy Glass Outer Shell"
+// per the design reference. transmission is
+// the single most expensive PBR feature here,
+// but at NODE_RADIUS scale and 5 instances
+// total it stays comfortably cheap.
 // =========================================
 
 function createShellMaterial() {
@@ -17,15 +22,21 @@ function createShellMaterial() {
 
         transparent: true,
 
-        opacity: 0.5,
+        opacity: 0.35,
 
-        roughness: 0.15,
+        roughness: 0.05,
 
-        metalness: 0.05,
+        metalness: 0,
+
+        transmission: 0.85,
+
+        thickness: 0.8,
+
+        ior: 1.45,
 
         clearcoat: 1,
 
-        clearcoatRoughness: 0.08,
+        clearcoatRoughness: 0.05,
 
         emissive: 0x1c7dff,
 
@@ -64,6 +75,29 @@ function createGlow() {
     });
 
     return new THREE.Mesh(geometry, material);
+
+}
+
+// =========================================
+// Holographic base — flat ripple ring under
+// each node, same billboard technique as the
+// AI core's base. Kept as a small helper here
+// since every node needs one, not just the
+// core.
+// =========================================
+
+function createHoloBase() {
+
+    const baseEl = document.createElement("div");
+    baseEl.className = "holo-base holo-base--node";
+    baseEl.innerHTML =
+        '<span class="holo-ring holo-ring-1"></span>' +
+        '<span class="holo-ring holo-ring-2"></span>';
+
+    const base = new CSS2DObject(baseEl);
+    base.position.set(0, -NODE_RADIUS * 1.35, 0);
+
+    return base;
 
 }
 
@@ -116,6 +150,7 @@ export function createProjectNodes(scene, aiCore) {
         );
 
         sphere.add(createGlow());
+        sphere.add(createHoloBase());
 
         sphere.userData = {
 
