@@ -100,7 +100,13 @@ export function animate({
         updateOrbit(projectNodes, aiCore, t);
 
         //----------------------------------
-        // Rotate spheres + per-node depth drift
+        // Per-node depth drift
+        // (self-rotation removed: each node's icon is fused to the
+        // front of its sphere as real geometry now, not a billboard —
+        // spinning the sphere on its own axis would eventually turn
+        // the icon away and show the plain glass back instead. Orbit
+        // motion + this parallax nudge already give it plenty of
+        // movement without ever hiding the face.)
         //----------------------------------
 
         if (projectNodes) {
@@ -108,9 +114,6 @@ export function animate({
             for (let i = 0; i < projectNodes.length; i++) {
 
                 const sphere = projectNodes[i];
-
-                sphere.rotation.y += 0.01;
-                sphere.rotation.x += 0.005;
 
                 const depth = sphere.userData.depth ?? 0.5;
 
