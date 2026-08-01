@@ -4,7 +4,9 @@ export function setupResize(
 
     renderer,
 
-    composer
+    composer,
+
+    labelRenderer
 
 ){
 
@@ -29,6 +31,18 @@ export function setupResize(
         if (composer) {
 
             composer.setSize(
+
+                window.innerWidth,
+
+                window.innerHeight
+
+            );
+
+        }
+
+        if (labelRenderer) {
+
+            labelRenderer.setSize(
 
                 window.innerWidth,
 
