@@ -56,7 +56,7 @@ function init() {
 
     const aiCore = createAiCore(scene);
 
-    const spheres = createSpheres(scene);
+const projectNodes = createProjectNodes(scene, aiCore);
 
     const controls = createControls(
         camera,
@@ -77,19 +77,18 @@ function init() {
 
     animate({
 
-        renderer,
-        composer,
+    renderer,
+    composer,
 
-        scene,
-        camera,
+    scene,
+    camera,
 
-        controls,
+    controls,
 
-        aiCore,
+    aiCore,
+    projectNodes
 
-        spheres
-
-    });
+});
 
 }
 
