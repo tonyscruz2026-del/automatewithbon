@@ -26,13 +26,17 @@ export function setupResize(
 
         );
 
-        composer.setSize(
+        if (composer) {
 
-            window.innerWidth,
+            composer.setSize(
 
-            window.innerHeight
+                window.innerWidth,
 
-        );
+                window.innerHeight
+
+            );
+
+        }
 
     });
 
