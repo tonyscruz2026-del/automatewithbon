@@ -24,6 +24,11 @@
         href="./css/hero3d.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="./css/parallaxLayers.css"
+    >
+
 </head>
 
 <body>
@@ -133,9 +138,20 @@
          so the parallax has somewhere to go.
     ======================================= -->
 
-    <section class="next-section-placeholder">
+    <section class="parallax-section">
 
-        <p>Your next section goes here.</p>
+        <div class="parallax-stage">
+
+            <div class="parallax-layer parallax-layer--back"></div>
+            <div class="parallax-layer parallax-layer--mid"></div>
+            <div class="parallax-layer parallax-layer--front"></div>
+
+            <div class="parallax-caption">
+                <h2>Built to Scale With You</h2>
+                <p>Every workflow, every integration, working together.</p>
+            </div>
+
+        </div>
 
     </section>
 
@@ -183,6 +199,15 @@
         type="module"
         src="./js/hero3d/hero3d.js"
     ></script>
+
+    <!-- ======================================
+         PARALLAX SHOWCASE SECTION
+    ======================================= -->
+
+    <script type="module">
+        import { initParallaxLayers } from "./js/parallaxLayers.js";
+        initParallaxLayers(".parallax-section");
+    </script>
 
 </body>
 
