@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
 const NODE_RADIUS = 0.52;
+const CAP_ANGLE = Math.PI * 0.47; // slightly under a full hemisphere — same technique as aiCore's original fused panel
 
 // One reference-design node icon per project, in the same order as
 // the projects array below. Swap these filenames for per-project
@@ -18,57 +19,118 @@ const NODE_IMAGES = [
 ];
 
 // =========================================
-// Invisible hit-target
+// Front panel geometry — a curved cap (a literal slice of a
+// sphere, same radius as the base) with the icon projected onto
+// it STRAIGHT (an orthographic "looking straight at it" projection),
+// so the icon itself isn't warped the way a spherical UV wrap or a
+// matcap material would distort it.
 //
-// raycaster.js does raycaster.intersectObjects(projectNodes) against
-// real WebGL geometry — a CSS2DObject (a DOM element) can't be hit
-// this way. So each node is still a real THREE.Mesh, just fully
-// transparent (opacity 0, but visible: true so THREE.Raycaster
-// doesn't skip it). The visible image sprite is attached to this
-// mesh as a child, so it inherits the mesh's position automatically
-// every frame from orbitSystem.js — no raycaster/orbit code needed
-// to change at all.
+// This is the same technique used for the AI core's original visual
+// (see the note in aiCore.js's git history) — reproduced here as a
+// self-contained helper since aiCore.js no longer needs it after
+// switching to a GLB model.
 // =========================================
 
-function createHitTarget() {
+function buildFrontPanelGeometry(radius, capAngle) {
 
-    const geometry = new THREE.SphereGeometry(NODE_RADIUS, 24, 24);
+    const geometry = new THREE.SphereGeometry(
 
-    const material = new THREE.MeshBasicMaterial({
+        radius * 1.003,
 
-        transparent: true,
-        opacity: 0,
-        depthWrite: false
+        64,
 
-    });
+        32,
 
-    return new THREE.Mesh(geometry, material);
+        0,
+        Math.PI * 2,
+
+        0,
+        capAngle
+
+    );
+
+    const posAttr = geometry.attributes.position;
+    const uvAttr = geometry.attributes.uv;
+
+    const rimRadius = radius * Math.sin(capAngle);
+
+    for (let i = 0; i < posAttr.count; i++) {
+
+        const x = posAttr.getX(i);
+        const z = posAttr.getZ(i);
+
+        const u = (x / rimRadius) * 0.5 + 0.5;
+        const v = (-z / rimRadius) * 0.5 + 0.5;
+
+        uvAttr.setXY(i, u, v);
+
+    }
+
+    uvAttr.needsUpdate = true;
+
+    // Re-orient from facing +Y (the cap's default pole) to facing +Z,
+    // toward the camera.
+    geometry.rotateX(Math.PI / 2);
+
+    return geometry;
 
 }
 
 // =========================================
-// Image sprite — same billboard technique as
-// the AI core (see aiCore.js for the full
-// explanation of how CSS2DObject + mix-blend-
-// mode:screen works together).
+// Real glass sphere + fused icon panel.
+//
+// The panel is added as a CHILD of the base sphere (not a sibling,
+// unlike the AI core's original setup) specifically so it inherits
+// rotation automatically. animate.js already does
+// `sphere.rotation.y += 0.01` / `sphere.rotation.x += 0.005` on each
+// project node — since frontPanel is now a child of that same sphere,
+// it turns with it for free, no extra sync code needed anywhere.
+//
+// This mesh is also the actual raycast target (see notes below on
+// why the old separate invisible hit-target mesh is gone).
 // =========================================
 
-function createSprite(imageSrc) {
+function createProjectSphere(imageSrc) {
 
-    const wrap = document.createElement("div");
-    wrap.className = "node-sprite-wrap";
+    const baseGeometry = new THREE.SphereGeometry(NODE_RADIUS, 48, 48);
 
-    const img = document.createElement("img");
-    img.className = "node-sprite";
-    img.src = imageSrc;
-    img.alt = "";
+    const baseMaterial = new THREE.MeshPhysicalMaterial({
 
-    wrap.appendChild(img);
+        color: 0x11244a,
 
-    const sprite = new CSS2DObject(wrap);
-    sprite.position.set(0, 0, 0);
+        transmission: 0.5,
+        thickness: 0.8,
+        roughness: 0.22,
+        ior: 1.3,
 
-    return sprite;
+        emissive: 0x0c3d7a,
+        emissiveIntensity: 0.55,
+
+        transparent: true,
+        opacity: 0.95
+
+    });
+
+    const baseSphere = new THREE.Mesh(baseGeometry, baseMaterial);
+
+    const panelTexture = new THREE.TextureLoader().load(imageSrc);
+    panelTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const panelGeometry = buildFrontPanelGeometry(NODE_RADIUS, CAP_ANGLE);
+
+    const panelMaterial = new THREE.MeshBasicMaterial({
+
+        map: panelTexture,
+
+        transparent: true
+
+    });
+
+    const frontPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+
+    baseSphere.add(frontPanel);
+
+    return baseSphere;
 
 }
 
@@ -131,9 +193,14 @@ export function createProjectNodes(scene, aiCore) {
 
     projects.forEach((project, index) => {
 
-        const node = createHitTarget();
+        // The sphere itself is now the real, visible geometry AND the
+        // raycast target (raycaster.js calls
+        // intersectObjects(projectNodes) non-recursively, so it only
+        // ever needed the top-level object in this array to be real
+        // geometry — which it now is, instead of the old invisible
+        // placeholder mesh with a flat image floating in front of it).
+        const node = createProjectSphere(NODE_IMAGES[index % NODE_IMAGES.length]);
 
-        node.add(createSprite(NODE_IMAGES[index % NODE_IMAGES.length]));
         node.add(createHoloBase());
 
         node.userData = {
