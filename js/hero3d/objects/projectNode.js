@@ -1,13 +1,25 @@
 import * as THREE from "three";
 import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const NODE_RADIUS = 0.52;
-const CAP_ANGLE = Math.PI * 0.47; // slightly under a full hemisphere — same technique as aiCore's original fused panel
+const CAP_ANGLE = Math.PI * 0.47; // slightly under a full hemisphere — same technique as the icon panel below
+
+const GLB_PATH = "assets/hero3d/ai_sphere.glb";
+
+// aiCore.js authors its model at CORE_RADIUS (1.0) with its own
+// GLB_SCALE (currently 1.15). We don't import that file's internals
+// here, so this ratio just reproduces the same relative sizing: the
+// model scaled down proportionally to NODE_RADIUS instead of the
+// core's full size. If it looks off once loaded, this is the number
+// to tune (independently of aiCore.js's own GLB_SCALE).
+const CORE_RADIUS_REFERENCE = 1.0;
+const CORE_GLB_SCALE_REFERENCE = 1.15;
+const NODE_GLB_SCALE =
+    CORE_GLB_SCALE_REFERENCE * (NODE_RADIUS / CORE_RADIUS_REFERENCE);
 
 // One reference-design node icon per project, in the same order as
-// the projects array below. Swap these filenames for per-project
-// custom art later; for now they're crops from the "Node Sphere
-// Variants" reference image.
+// the projects array below.
 const NODE_IMAGES = [
 
     "assets/hero3d/node-lead.png",       // Messenger AI
@@ -19,16 +31,101 @@ const NODE_IMAGES = [
 ];
 
 // =========================================
-// Front panel geometry — a curved cap (a literal slice of a
-// sphere, same radius as the base) with the icon projected onto
-// it STRAIGHT (an orthographic "looking straight at it" projection),
-// so the icon itself isn't warped the way a spherical UV wrap or a
-// matcap material would distort it.
-//
-// This is the same technique used for the AI core's original visual
-// (see the note in aiCore.js's git history) — reproduced here as a
-// self-contained helper since aiCore.js no longer needs it after
-// switching to a GLB model.
+// Shared GLB load — loaded once, then cloned per node, instead of
+// re-fetching the same file five times.
+// =========================================
+
+let sharedGltfPromise = null;
+
+function loadSharedCoreModel() {
+
+    if (sharedGltfPromise) return sharedGltfPromise;
+
+    const loader = new GLTFLoader();
+
+    sharedGltfPromise = new Promise((resolve, reject) => {
+
+        loader.load(GLB_PATH, resolve, undefined, reject);
+
+    });
+
+    return sharedGltfPromise;
+
+}
+
+// =========================================
+// Invisible hit-target — kept as a real Mesh (not a Group) so
+// raycaster.js's intersectObjects(projectNodes) keeps working exactly
+// as before, regardless of whether it's called with the recursive
+// flag or not. The GLB clone and icon panel are added as children on
+// top of this for the visible/clickable-looking part.
+// =========================================
+
+function createHitTarget() {
+
+    const geometry = new THREE.SphereGeometry(NODE_RADIUS, 24, 24);
+
+    const material = new THREE.MeshBasicMaterial({
+
+        transparent: true,
+        opacity: 0,
+        depthWrite: false
+
+    });
+
+    return new THREE.Mesh(geometry, material);
+
+}
+
+// =========================================
+// Cloned AI-core model, scaled down to node size. Async — if it
+// hasn't finished loading yet, the node is still fully clickable
+// (the invisible hit-target above already exists), it just doesn't
+// have its glass-sphere visual until this resolves.
+// =========================================
+
+function attachClonedCoreModel(node) {
+
+    loadSharedCoreModel()
+        .then((gltf) => {
+
+            const model = gltf.scene.clone(true);
+            model.scale.setScalar(NODE_GLB_SCALE);
+
+            node.add(model);
+
+        })
+        .catch((err) => {
+
+            console.warn(
+                "Node GLB failed to load, falling back to a plain glass sphere.",
+                err
+            );
+
+            const fallbackGeometry = new THREE.SphereGeometry(NODE_RADIUS, 32, 32);
+
+            const fallbackMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x11244a,
+                transmission: 0.5,
+                thickness: 0.8,
+                roughness: 0.22,
+                ior: 1.3,
+                emissive: 0x0c3d7a,
+                emissiveIntensity: 0.55,
+                transparent: true,
+                opacity: 0.95
+            });
+
+            node.add(new THREE.Mesh(fallbackGeometry, fallbackMaterial));
+
+        });
+
+}
+
+// =========================================
+// Icon panel — the same fused, undistorted-projection cap technique
+// as before, giving each node its own project icon regardless of
+// which model the glass sphere itself is using underneath.
 // =========================================
 
 function buildFrontPanelGeometry(radius, capAngle) {
@@ -68,50 +165,13 @@ function buildFrontPanelGeometry(radius, capAngle) {
 
     uvAttr.needsUpdate = true;
 
-    // Re-orient from facing +Y (the cap's default pole) to facing +Z,
-    // toward the camera.
     geometry.rotateX(Math.PI / 2);
 
     return geometry;
 
 }
 
-// =========================================
-// Real glass sphere + fused icon panel.
-//
-// The panel is added as a CHILD of the base sphere (not a sibling,
-// unlike the AI core's original setup) specifically so it inherits
-// rotation automatically. animate.js already does
-// `sphere.rotation.y += 0.01` / `sphere.rotation.x += 0.005` on each
-// project node — since frontPanel is now a child of that same sphere,
-// it turns with it for free, no extra sync code needed anywhere.
-//
-// This mesh is also the actual raycast target (see notes below on
-// why the old separate invisible hit-target mesh is gone).
-// =========================================
-
-function createProjectSphere(imageSrc) {
-
-    const baseGeometry = new THREE.SphereGeometry(NODE_RADIUS, 48, 48);
-
-    const baseMaterial = new THREE.MeshPhysicalMaterial({
-
-        color: 0x11244a,
-
-        transmission: 0.5,
-        thickness: 0.8,
-        roughness: 0.22,
-        ior: 1.3,
-
-        emissive: 0x0c3d7a,
-        emissiveIntensity: 0.55,
-
-        transparent: true,
-        opacity: 0.95
-
-    });
-
-    const baseSphere = new THREE.Mesh(baseGeometry, baseMaterial);
+function createIconPanel(imageSrc) {
 
     const panelTexture = new THREE.TextureLoader().load(imageSrc);
     panelTexture.colorSpace = THREE.SRGBColorSpace;
@@ -126,11 +186,7 @@ function createProjectSphere(imageSrc) {
 
     });
 
-    const frontPanel = new THREE.Mesh(panelGeometry, panelMaterial);
-
-    baseSphere.add(frontPanel);
-
-    return baseSphere;
+    return new THREE.Mesh(panelGeometry, panelMaterial);
 
 }
 
@@ -193,14 +249,10 @@ export function createProjectNodes(scene, aiCore) {
 
     projects.forEach((project, index) => {
 
-        // The sphere itself is now the real, visible geometry AND the
-        // raycast target (raycaster.js calls
-        // intersectObjects(projectNodes) non-recursively, so it only
-        // ever needed the top-level object in this array to be real
-        // geometry — which it now is, instead of the old invisible
-        // placeholder mesh with a flat image floating in front of it).
-        const node = createProjectSphere(NODE_IMAGES[index % NODE_IMAGES.length]);
+        const node = createHitTarget();
 
+        attachClonedCoreModel(node);
+        node.add(createIconPanel(NODE_IMAGES[index % NODE_IMAGES.length]));
         node.add(createHoloBase());
 
         node.userData = {
@@ -215,9 +267,6 @@ export function createProjectNodes(scene, aiCore) {
 
             isProject: true,
 
-            // Used by the parallax layer to give each node a slightly
-            // different amount of mouse-driven drift, so the cluster
-            // reads as several depths instead of one flat plane.
             depth: 0.35 + index * 0.1
 
         };
