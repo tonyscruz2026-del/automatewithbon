@@ -36,8 +36,9 @@ export function animate({
             : { mouseX: 0, mouseY: 0, scroll: 0 };
 
         //----------------------------------
-        // AI Core (real 3D geometry, matcap-shaded
-        // with your actual reference art)
+        // AI Core (real 3D geometry: a plain glass
+        // base sphere with your actual reference art
+        // fused onto the front as a real curved panel)
         //----------------------------------
 
         const coreState = getCoreState(t);
@@ -49,30 +50,30 @@ export function animate({
             const pulse = 1 + Math.sin(t * 3) * 0.04 * coreState.emissive;
             aiCore.scale.setScalar(pulse);
 
-            if (parts.sphere) {
+            // Slow idle spin, applied identically to both fused pieces
+            // so the front panel stays locked to the base sphere's
+            // surface instead of drifting independently of it.
+            const spin = t * 0.05;
 
-                // MatCap materials have no emissiveIntensity — pushing
-                // .color slightly above 1 brightens the sampled matcap
-                // pixels instead, which still feeds the bloom pass.
-                const glowBoost = 1 + coreState.emissive * 0.12;
+            if (parts.baseSphere) {
 
-                parts.sphere.material.color.setScalar(glowBoost);
+                parts.baseSphere.rotation.y = spin;
 
-                parts.sphere.rotation.y = t * 0.05;
+                parts.baseSphere.material.emissiveIntensity =
+                    0.45 + coreState.emissive * 0.35;
 
             }
 
-            if (parts.atmosphere) {
+            if (parts.frontPanel) {
 
-                parts.atmosphere.material.uniforms.intensity.value =
-                    0.55 + coreState.glow * 0.5;
+                parts.frontPanel.rotation.y = spin;
 
             }
 
             if (parts.coreLight) {
 
                 parts.coreLight.intensity =
-                    6 + coreState.emissive * 8;
+                    5 + coreState.emissive * 7;
 
             }
 
