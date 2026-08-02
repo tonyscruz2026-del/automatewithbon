@@ -70,3 +70,21 @@
     opacity:0.35;
 
 }
+
+/* ===========================================================
+   TEMPORARY DIAGNOSTIC — remove this block once we've confirmed
+   whether the element renders at all. If you see a solid red
+   rectangle in the hero after this is live, the element is
+   rendering fine and it's purely an opacity/blend-mode issue.
+   If you see NOTHING, something else is hiding the element
+   entirely and we need to look at that instead.
+=========================================================== */
+
+.img-par-mid{
+
+    background-image: none !important;
+    background-color: red !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+
+}
