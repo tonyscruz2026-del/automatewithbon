@@ -41,6 +41,18 @@
 
         <header class="hero">
 
+            <!-- 3-image big-movement parallax layer
+                 (first in DOM = painted first = behind everything
+                 else that follows, including the canvas) -->
+
+            <div class="image-parallax-layer" aria-hidden="true">
+
+                <div class="img-par img-par-back"></div>
+                <div class="img-par img-par-mid"></div>
+                <div class="img-par img-par-front"></div>
+
+            </div>
+
             <!-- Three.js Canvas -->
 
             <canvas id="heroCanvas"></canvas>
@@ -53,16 +65,6 @@
                 <div class="cloud cloud-right-far"></div>
                 <div class="cloud cloud-left-near"></div>
                 <div class="cloud cloud-right-near"></div>
-
-            </div>
-
-            <!-- 3-image big-movement parallax layer -->
-
-            <div class="image-parallax-layer" aria-hidden="true">
-
-                <div class="img-par img-par-back"></div>
-                <div class="img-par img-par-mid"></div>
-                <div class="img-par img-par-front"></div>
 
             </div>
 
