@@ -26,7 +26,7 @@
 
     <link
         rel="stylesheet"
-        href="./css/parallaxLayers.css"
+        href="./css/heroImageParallax.css"
     >
 
 </head>
@@ -53,6 +53,16 @@
                 <div class="cloud cloud-right-far"></div>
                 <div class="cloud cloud-left-near"></div>
                 <div class="cloud cloud-right-near"></div>
+
+            </div>
+
+            <!-- 3-image big-movement parallax layer -->
+
+            <div class="image-parallax-layer" aria-hidden="true">
+
+                <div class="img-par img-par-back"></div>
+                <div class="img-par img-par-mid"></div>
+                <div class="img-par img-par-front"></div>
 
             </div>
 
@@ -135,23 +145,12 @@
     <!-- ======================================
          NEXT SECTION — swap for real content.
          This just gives the page room to scroll
-         so the parallax has somewhere to go.
+         so the hero's parallax has somewhere to go.
     ======================================= -->
 
-    <section class="parallax-section">
+    <section class="next-section-placeholder">
 
-        <div class="parallax-stage">
-
-            <div class="parallax-layer parallax-layer--back"></div>
-            <div class="parallax-layer parallax-layer--mid"></div>
-            <div class="parallax-layer parallax-layer--front"></div>
-
-            <div class="parallax-caption">
-                <h2>Built to Scale With You</h2>
-                <p>Every workflow, every integration, working together.</p>
-            </div>
-
-        </div>
+        <p>Your next section goes here.</p>
 
     </section>
 
@@ -199,15 +198,6 @@
         type="module"
         src="./js/hero3d/hero3d.js"
     ></script>
-
-    <!-- ======================================
-         PARALLAX SHOWCASE SECTION
-    ======================================= -->
-
-    <script type="module">
-        import { initParallaxLayers } from "./js/parallax/parallaxLayers.js";
-        initParallaxLayers(".parallax-section");
-    </script>
 
 </body>
 
