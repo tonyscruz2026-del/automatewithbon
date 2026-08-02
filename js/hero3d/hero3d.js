@@ -19,6 +19,7 @@ import { createParallax } from "./interaction/parallax.js";
 import { createInfoPanel } from "./ui/infoPanel.js";
 import { createNodeLabels } from "./ui/nodeLabels.js";
 import { createAtmosphere } from "./ui/atmosphere.js";
+import { createImageParallax } from "./ui/imageParallax.js";
 
 import { createBloom } from "./effects/bloom.js";
 
@@ -191,6 +192,8 @@ function init() {
 
     const atmosphere = createAtmosphere();
 
+    const imageParallax = createImageParallax();
+
     animate({
 
         renderer,
@@ -217,7 +220,9 @@ function init() {
 
         heroContentEl,
 
-        atmosphere
+        atmosphere,
+
+        imageParallax
 
     });
 
