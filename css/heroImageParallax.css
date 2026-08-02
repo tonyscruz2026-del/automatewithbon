@@ -1,18 +1,17 @@
 /* ===========================================================
    HERO IMAGE PARALLAX LAYER
-   Sits BEHIND the 3D canvas — negative z-index puts it below
-   everything else in .hero's stacking context, so the orb
-   spheres, their labels, and the cloud lines all render on
-   top of it, same as it was meant to be: a background depth
-   plane, not something covering your actual product content.
+   No z-index here on purpose — this element is placed as the
+   very FIRST child of .hero in the HTML, so normal paint order
+   alone puts it behind the canvas, clouds, labels, and text
+   that follow it. Simpler and more reliable than fighting
+   negative z-index against .hero's gradient pseudo-element and
+   sticky-positioning stacking context.
 =========================================================== */
 
 .image-parallax-layer{
 
     position:absolute;
     inset:0;
-
-    z-index:-1;
 
     overflow:hidden;
 
