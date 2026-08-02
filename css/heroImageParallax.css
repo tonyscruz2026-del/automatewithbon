@@ -1,17 +1,26 @@
 /* ===========================================================
    HERO IMAGE PARALLAX LAYER
-   No z-index here on purpose — this element is placed as the
-   very FIRST child of .hero in the HTML, so normal paint order
-   alone puts it behind the canvas, clouds, labels, and text
-   that follow it. Simpler and more reliable than fighting
-   negative z-index against .hero's gradient pseudo-element and
-   sticky-positioning stacking context.
+
+   IMPORTANT: this sits ABOVE the canvas (explicit z-index), not
+   behind it. UnrealBloomPass (see effects/bloom.js) always
+   outputs full opacity in its final composite regardless of
+   scene.background — a known limitation of that pass — so the
+   canvas is effectively opaque once rendering starts. Trying to
+   sit behind it means never being visible past the first frame.
+
+   Every layer uses mix-blend-mode:screen, which can only ADD
+   brightness to what's underneath — it's mathematically
+   incapable of covering or darkening the orb spheres, so this
+   layer can enhance the scene without ever visually erasing
+   your actual content, regardless of z-order.
 =========================================================== */
 
 .image-parallax-layer{
 
     position:absolute;
     inset:0;
+
+    z-index:1;
 
     overflow:hidden;
 
@@ -28,6 +37,8 @@
     background-position:center;
     background-repeat:no-repeat;
 
+    mix-blend-mode:screen;
+
     will-change:transform;
 
 }
@@ -36,7 +47,7 @@
 
     background-image:url("../assets/parallax/layer-back.png");
 
-    opacity:0.55;
+    opacity:0.4;
 
 }
 
@@ -44,9 +55,7 @@
 
     background-image:url("../assets/parallax/layer-mid.png");
 
-    mix-blend-mode:screen;
-
-    opacity:0.75;
+    opacity:0.55;
 
 }
 
@@ -54,8 +63,10 @@
 
     background-image:url("../assets/parallax/layer-front.png");
 
-    mix-blend-mode:screen;
-
-    opacity:0.9;
+    /* Lowest of the three — this is the layer whose icons sit
+       closest to where your orb spheres already are, so keeping
+       it more subtle avoids visual clutter even though screen
+       blend can't literally hide anything underneath it. */
+    opacity:0.35;
 
 }
