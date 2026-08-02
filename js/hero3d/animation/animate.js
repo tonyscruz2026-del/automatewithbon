@@ -21,7 +21,8 @@ export function animate({
     parallaxGroup,
     starsGroup,
     heroContentEl,
-    atmosphere
+    atmosphere,
+    imageParallax
 
 }) {
 
@@ -169,6 +170,18 @@ export function animate({
         if (atmosphere) {
 
             atmosphere.update(p);
+
+        }
+
+        //----------------------------------
+        // Parallax layer: 3-image showcase
+        // (big movement, same shared scroll/mouse
+        // state as every other hero layer)
+        //----------------------------------
+
+        if (imageParallax) {
+
+            imageParallax.update(p);
 
         }
 
