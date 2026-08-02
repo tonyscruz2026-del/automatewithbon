@@ -1,0 +1,62 @@
+/* ===========================================================
+   HERO IMAGE PARALLAX LAYER
+   Sits inside .hero, between the 3D canvas (z-index:auto/0)
+   and the cloud/atmosphere layer (z-index:2) — so it reads as
+   another depth plane in the same scene, not a bolted-on
+   section. mix-blend-mode:screen drops the pure-black
+   background of each image automatically.
+=========================================================== */
+
+.image-parallax-layer{
+
+    position:absolute;
+    inset:0;
+
+    z-index:1;
+
+    overflow:hidden;
+
+    pointer-events:none;
+
+}
+
+.img-par{
+
+    position:absolute;
+    inset:-25% -25%;
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    will-change:transform;
+
+}
+
+.img-par-back{
+
+    background-image:url("../assets/parallax/layer-back.png");
+
+    opacity:0.55;
+
+}
+
+.img-par-mid{
+
+    background-image:url("../assets/parallax/layer-mid.png");
+
+    mix-blend-mode:screen;
+
+    opacity:0.75;
+
+}
+
+.img-par-front{
+
+    background-image:url("../assets/parallax/layer-front.png");
+
+    mix-blend-mode:screen;
+
+    opacity:0.9;
+
+}
