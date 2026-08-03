@@ -30,10 +30,11 @@ export function animate({
 
         requestAnimationFrame(loop);
 
-        const t = clock.getElapsedTime();
+        const dt = clock.getDelta();
+        const t = clock.elapsedTime;
 
         const p = parallax
-            ? parallax.update()
+            ? parallax.update(dt)
             : { mouseX: 0, mouseY: 0, scroll: 0 };
 
         //----------------------------------
