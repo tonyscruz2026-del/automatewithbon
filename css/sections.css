@@ -282,7 +282,7 @@
 /* ============ SCROLLYTELLING (How It Works) ============
    Height tuned: 300vh -> 220vh. 3 steps still get ~73vh of scroll
    each to trigger — comfortable pacing without excess dead space. */
-.scrolly { position: relative; height: 220vh; background: var(--bg-black); }
+.scrolly { position: relative; height: 350vh; background: var(--bg-black); }
 .scrolly-pin {
   position: sticky; top: 0; height: 100vh; height: 100dvh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -313,7 +313,7 @@
    so this just compresses the scroll distance to match — the
    near-black canvas background made the old 400vh feel especially
    empty since there's very little on-screen at any given moment. */
-.cinema-scrolly { position: relative; height: 220vh; background: var(--bg-black); }
+.cinema-scrolly { position: relative; height: 350vh; background: var(--bg-black); }
 .cinema-pin { position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 #pipelineCanvas { width: 100%; height: 100%; display: block; }
 .cinema-caption { position: absolute; bottom: 4rem; left: 50%; transform: translateX(-50%); text-align: center; max-width: 480px; padding: 0 1.5rem; }
@@ -328,14 +328,14 @@
    Height tuned: 400vh -> 220vh, same reasoning as the cinema
    section above — this one especially, since the visible content
    per frame is a thin trail of small spheres against near-black. */
-.scene3d-scroll { position: relative; height: 220vh; background: var(--bg-black); }
+.scene3d-scroll { position: relative; height: 350vh; background: var(--bg-black); }
 .scene3d-pin { position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 #threeContainer { width: 100%; height: 100%; }
 #threeContainer canvas { display: block; width: 100% !important; height: 100% !important; }
 
 /* ============ HORIZONTAL SCROLL GALLERY ============
    Height tuned: 260vh -> 200vh. */
-.hscroll-section { position: relative; height: 200vh; background: var(--bg-black); }
+.hscroll-section { position: relative; height: 320vh; background: var(--bg-black); }
 .hscroll-pin { position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 .hscroll-header { text-align: center; margin-bottom: 2rem; padding: 0 4rem; }
 .hscroll-header h2 { font-family: var(--sans); font-weight: 800; color: var(--ink); font-size: clamp(1.4rem, 2.6vw, 1.9rem); }
