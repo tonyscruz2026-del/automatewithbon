@@ -31,15 +31,20 @@
    cluster sits — any opacity strong enough for the corners also
    dimmed the spheres.
 
-   Real fix: .img-par now has a radial mask (see mask-image
-   above) that clears the center of the layer entirely,
-   regardless of opacity — so the sphere area can never be
-   touched by this layer no matter how bright the corners get.
-   With that safety in place, opacity is pushed up to 0.75/0.85
-   for genuinely vivid corner imagery. Adjust the mask's 38%/72%
-   stops if the clear-center zone needs to be bigger/smaller for
-   your layout, and adjust opacity freely without worrying about
-   sphere contrast anymore.
+   Real fix: a radial mask clears the center where the spheres
+   live, regardless of opacity, so opacity could be pushed to
+   0.75/0.85 for genuinely vivid corner imagery without risking
+   the spheres. First attempt put that mask on .img-par itself —
+   but .img-par is deliberately oversized (inset:-25% -25%, i.e.
+   150% of the viewport) to give the parallax drift room to move
+   without ever showing an edge, so the mask's percentages ended
+   up calculated against that oversized box instead of the real
+   screen, pushing the "fully visible" zone well past the actual
+   corners. Moved the mask to .image-parallax-layer instead — the
+   parent, which is exactly inset:0 (the real viewport size) — so
+   30%/62% now correspond to what's actually on screen. Adjust
+   those two stops directly if the clear-center zone needs to be
+   bigger/smaller for your layout.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -47,6 +52,26 @@
     z-index:2;
     overflow:hidden;
     pointer-events:none;
+
+    /* Clears the center of the whole composed layer (roughly
+       where the orb sphere cluster lives), regardless of each
+       child's opacity — sized against this container's real
+       viewport dimensions, not the oversized -25% child boxes
+       below, so the percentages actually line up with what's on
+       screen. Transparent out to ~30% of the radius, ramps to
+       fully visible by ~62%. */
+    -webkit-mask-image:radial-gradient(
+        circle at center,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0) 30%,
+        rgba(0,0,0,1) 62%
+    );
+    mask-image:radial-gradient(
+        circle at center,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0) 30%,
+        rgba(0,0,0,1) 62%
+    );
 }
 .img-par{
     position:absolute;
@@ -56,24 +81,6 @@
     background-repeat:no-repeat;
     mix-blend-mode:screen;
     will-change:transform;
-
-    /* Physically clears the center of this layer (roughly where
-       the orb sphere cluster lives) regardless of opacity, so the
-       corner imagery can be pushed as bright as we want without
-       ever competing with the spheres. Transparent out to ~38%
-       of the radius, then ramps up to fully visible by ~72%. */
-    -webkit-mask-image:radial-gradient(
-        circle at center,
-        rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0) 38%,
-        rgba(0,0,0,1) 72%
-    );
-    mask-image:radial-gradient(
-        circle at center,
-        rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0) 38%,
-        rgba(0,0,0,1) 72%
-    );
 }
 .img-par-back{
     background-image:url("../assets/parallax/layer-back.png");
