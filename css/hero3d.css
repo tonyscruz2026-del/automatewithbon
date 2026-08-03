@@ -568,6 +568,15 @@ align-items:center;
    page scrolls, and nudges them gently
    with the mouse — an extra parallax
    layer on top of the 3D scene.
+
+   NOTE: positions were originally pushed
+   too far off-canvas (top/left as low as
+   -20%) combined with a heavy 70px blur,
+   which made them nearly invisible against
+   the already-blue hero background even at
+   full opacity. Pulled further into frame,
+   opacity raised, and blur reduced so they
+   actually read as a visible atmosphere layer.
 =========================== */
 
 .atmosphere-layer{
@@ -592,7 +601,7 @@ align-items:center;
 
     border-radius:50%;
 
-    filter:blur(70px);
+    filter:blur(50px);
 
     will-change:transform, opacity;
 
@@ -602,8 +611,8 @@ align-items:center;
 
 .cloud-left-far{
 
-    top:-12%;
-    left:-20%;
+    top:-4%;
+    left:-8%;
 
     width:46vw;
     height:46vw;
@@ -615,14 +624,14 @@ align-items:center;
         transparent 75%
     );
 
-    opacity:0.55;
+    opacity:0.85;
 
 }
 
 .cloud-right-far{
 
-    bottom:-16%;
-    right:-20%;
+    bottom:-6%;
+    right:-8%;
 
     width:50vw;
     height:50vw;
@@ -634,7 +643,7 @@ align-items:center;
         transparent 75%
     );
 
-    opacity:0.5;
+    opacity:0.8;
 
 }
 
@@ -643,40 +652,40 @@ align-items:center;
 .cloud-left-near{
 
     top:32%;
-    left:-12%;
+    left:-4%;
 
     width:26vw;
     height:26vw;
 
-    filter:blur(50px);
+    filter:blur(45px);
 
     background:radial-gradient(
         circle,
-        rgba(190,80,255,0.45),
+        rgba(190,80,255,0.6),
         transparent 70%
     );
 
-    opacity:0.45;
+    opacity:0.7;
 
 }
 
 .cloud-right-near{
 
     top:6%;
-    right:-9%;
+    right:-2%;
 
     width:22vw;
     height:22vw;
 
-    filter:blur(50px);
+    filter:blur(45px);
 
     background:radial-gradient(
         circle,
-        rgba(90,180,255,0.4),
+        rgba(90,180,255,0.55),
         transparent 70%
     );
 
-    opacity:0.4;
+    opacity:0.65;
 
 }
 
