@@ -24,15 +24,20 @@
    visually competed with the orb spheres as a distinct shape.
    .img-par-back and .img-par-mid stay ON (nebula wisps + node
    network, both corner-clustered images with mostly black
-   elsewhere). Opacity tuned across a few rounds — 0.4/0.55
-   washed out the spheres, 0.16/0.2 was invisible, 0.3/0.38 read
-   as background texture rather than a distinct layer — now at
-   0.48/0.58 so both layers (spheres + parallax images) should
-   read clearly at the same time. If the spheres start losing
-   contrast again at this level, pull both back down a bit; if
-   the parallax images still don't feel distinct enough, push
-   them up further — these two opacity values are the only knob
-   that needs touching for this balance.
+   elsewhere). Opacity has bounced a few rounds trying to land
+   both "spheres stay clear" and "parallax layer reads as
+   distinct" at once: 0.4/0.55 washed spheres out, 0.16/0.2 was
+   invisible, 0.3/0.38 too subtle, 0.48/0.58 washed spheres out
+   again — now at 0.24/0.3, one notch below the "too subtle"
+   point, aiming for the actual sweet spot in between.
+
+   If pure opacity tuning keeps forcing a tradeoff between the
+   two, the more robust fix is to stop covering the full
+   viewport and instead position/size these backgrounds so their
+   bright content sits ONLY near the true corners (further from
+   where the sphere cluster lives), which would let opacity go
+   much higher without ever touching the center. Worth doing if
+   this back-and-forth doesn't converge soon.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -52,11 +57,11 @@
 }
 .img-par-back{
     background-image:url("../assets/parallax/layer-back.png");
-    opacity:0.48;
+    opacity:0.24;
 }
 .img-par-mid{
     background-image:url("../assets/parallax/layer-mid.png");
-    opacity:0.58;
+    opacity:0.3;
 }
 .img-par-front{
     /* Hidden — this was the icon layer (chat bubble, gear, mic,
