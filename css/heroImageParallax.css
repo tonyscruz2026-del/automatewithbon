@@ -24,10 +24,15 @@
    visually competed with the orb spheres as a distinct shape.
    .img-par-back and .img-par-mid stay ON (nebula wisps + node
    network, both corner-clustered images with mostly black
-   elsewhere). Opacity has been tuned a couple rounds: original
-   0.4/0.55 washed out the spheres' contrast, 0.16/0.2 was too
-   faint to read at all, currently at 0.3/0.38 as a middle
-   ground — adjust these two values directly to taste.
+   elsewhere). Opacity tuned across a few rounds — 0.4/0.55
+   washed out the spheres, 0.16/0.2 was invisible, 0.3/0.38 read
+   as background texture rather than a distinct layer — now at
+   0.48/0.58 so both layers (spheres + parallax images) should
+   read clearly at the same time. If the spheres start losing
+   contrast again at this level, pull both back down a bit; if
+   the parallax images still don't feel distinct enough, push
+   them up further — these two opacity values are the only knob
+   that needs touching for this balance.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -47,11 +52,11 @@
 }
 .img-par-back{
     background-image:url("../assets/parallax/layer-back.png");
-    opacity:0.3;
+    opacity:0.48;
 }
 .img-par-mid{
     background-image:url("../assets/parallax/layer-mid.png");
-    opacity:0.38;
+    opacity:0.58;
 }
 .img-par-front{
     /* Hidden — this was the icon layer (chat bubble, gear, mic,
