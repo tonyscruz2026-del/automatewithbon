@@ -22,22 +22,24 @@
 
    UPDATE: .img-par-front (icon layer) stays disabled — it
    visually competed with the orb spheres as a distinct shape.
-   .img-par-back and .img-par-mid stay ON (nebula wisps + node
-   network, both corner-clustered images with mostly black
-   elsewhere). Opacity has bounced a few rounds trying to land
-   both "spheres stay clear" and "parallax layer reads as
-   distinct" at once: 0.4/0.55 washed spheres out, 0.16/0.2 was
-   invisible, 0.3/0.38 too subtle, 0.48/0.58 washed spheres out
-   again — now at 0.24/0.3, one notch below the "too subtle"
-   point, aiming for the actual sweet spot in between.
 
-   If pure opacity tuning keeps forcing a tradeoff between the
-   two, the more robust fix is to stop covering the full
-   viewport and instead position/size these backgrounds so their
-   bright content sits ONLY near the true corners (further from
-   where the sphere cluster lives), which would let opacity go
-   much higher without ever touching the center. Worth doing if
-   this back-and-forth doesn't converge soon.
+   .img-par-back and .img-par-mid stay ON. Several rounds of pure
+   opacity tuning (0.4/0.55, 0.16/0.2, 0.3/0.38, 0.48/0.58) could
+   never get "spheres stay sharp" AND "parallax layer reads as
+   clearly visible" at the same time, because these backgrounds
+   cover the full viewport including right where the sphere
+   cluster sits — any opacity strong enough for the corners also
+   dimmed the spheres.
+
+   Real fix: .img-par now has a radial mask (see mask-image
+   above) that clears the center of the layer entirely,
+   regardless of opacity — so the sphere area can never be
+   touched by this layer no matter how bright the corners get.
+   With that safety in place, opacity is pushed up to 0.75/0.85
+   for genuinely vivid corner imagery. Adjust the mask's 38%/72%
+   stops if the clear-center zone needs to be bigger/smaller for
+   your layout, and adjust opacity freely without worrying about
+   sphere contrast anymore.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -54,14 +56,32 @@
     background-repeat:no-repeat;
     mix-blend-mode:screen;
     will-change:transform;
+
+    /* Physically clears the center of this layer (roughly where
+       the orb sphere cluster lives) regardless of opacity, so the
+       corner imagery can be pushed as bright as we want without
+       ever competing with the spheres. Transparent out to ~38%
+       of the radius, then ramps up to fully visible by ~72%. */
+    -webkit-mask-image:radial-gradient(
+        circle at center,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0) 38%,
+        rgba(0,0,0,1) 72%
+    );
+    mask-image:radial-gradient(
+        circle at center,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0) 38%,
+        rgba(0,0,0,1) 72%
+    );
 }
 .img-par-back{
     background-image:url("../assets/parallax/layer-back.png");
-    opacity:0.24;
+    opacity:0.75;
 }
 .img-par-mid{
     background-image:url("../assets/parallax/layer-mid.png");
-    opacity:0.3;
+    opacity:0.85;
 }
 .img-par-front{
     /* Hidden — this was the icon layer (chat bubble, gear, mic,
