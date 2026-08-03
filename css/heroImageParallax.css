@@ -20,11 +20,16 @@
    was set here. Bumped to 2 so this layer wins outright,
    regardless of DOM order.
 
-   UPDATE: .img-par-front (the icon layer: chat bubble, gear,
-   mic, calendar) disabled via display:none below — it was
-   overpowering the 3D orb spheres once it became visible.
-   Back + mid layers left active (they read as background
-   depth/texture, not competing focal shapes).
+   UPDATE: whole .image-parallax-layer disabled via display:none
+   below. Once visible (after the z-index fix), even with the
+   front icon layer removed, .img-par-back and .img-par-mid were
+   still sitting above the canvas with mix-blend-mode:screen and
+   washing out the 3D orb spheres' contrast/definition — both
+   are similarly-themed network/dot imagery, so instead of
+   reading as separate background depth they flattened into the
+   spheres and made them look hazy. .atmosphere-layer (the soft
+   nebula clouds) is untouched and still provides background
+   depth on its own.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -32,6 +37,7 @@
     z-index:2;
     overflow:hidden;
     pointer-events:none;
+    display:none;
 }
 .img-par{
     position:absolute;
