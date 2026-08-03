@@ -1,90 +1,54 @@
 /* ===========================================================
    HERO IMAGE PARALLAX LAYER
-
    IMPORTANT: this sits ABOVE the canvas (explicit z-index), not
    behind it. UnrealBloomPass (see effects/bloom.js) always
    outputs full opacity in its final composite regardless of
    scene.background — a known limitation of that pass — so the
    canvas is effectively opaque once rendering starts. Trying to
    sit behind it means never being visible past the first frame.
-
    Every layer uses mix-blend-mode:screen, which can only ADD
    brightness to what's underneath — it's mathematically
    incapable of covering or darkening the orb spheres, so this
    layer can enhance the scene without ever visually erasing
    your actual content, regardless of z-order.
+
+   NOTE: z-index was previously 1 — same as #heroCanvas in
+   hero3d.css. Equal z-index values fall back to DOM order to
+   break the tie, and the canvas comes AFTER this layer in
+   index.html, so the canvas was always winning and painting
+   fully over these images no matter what opacity/blend-mode
+   was set here. Bumped to 2 so this layer wins outright,
+   regardless of DOM order.
 =========================================================== */
-
 .image-parallax-layer{
-
     position:absolute;
     inset:0;
-
-    z-index:1;
-
+    z-index:2;
     overflow:hidden;
-
     pointer-events:none;
-
 }
-
 .img-par{
-
     position:absolute;
     inset:-25% -25%;
-
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
-
     mix-blend-mode:screen;
-
     will-change:transform;
-
 }
-
 .img-par-back{
-
     background-image:url("../assets/parallax/layer-back.png");
-
     opacity:0.4;
-
 }
-
 .img-par-mid{
-
     background-image:url("../assets/parallax/layer-mid.png");
-
     opacity:0.55;
-
 }
-
 .img-par-front{
-
     background-image:url("../assets/parallax/layer-front.png");
-
     /* Lowest of the three — this is the layer whose icons sit
        closest to where your orb spheres already are, so keeping
        it more subtle avoids visual clutter even though screen
        blend can't literally hide anything underneath it. */
     opacity:0.35;
-
-}
-
-/* ===========================================================
-   TEMPORARY DIAGNOSTIC — remove this block once we've confirmed
-   whether the element renders at all. If you see a solid red
-   rectangle in the hero after this is live, the element is
-   rendering fine and it's purely an opacity/blend-mode issue.
-   If you see NOTHING, something else is hiding the element
-   entirely and we need to look at that instead.
-=========================================================== */
-
-.img-par-mid{
-
-    background-image: none !important;
-    background-color: red !important;
-    opacity: 1 !important;
-    mix-blend-mode: normal !important;
-
 }
