@@ -18,6 +18,14 @@
   function clamp01(t) { return Math.max(0, Math.min(1, t)); }
   function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
+  /* Mobile browsers resize window.innerHeight as the address bar shows/
+     hides mid-scroll, which desyncs it from the 100vh/100dvh box the pin
+     is actually rendered at. Measuring the pin element itself keeps the
+     scroll-progress math locked to what's really on screen. */
+  function pinHeight(pinEl) {
+    return (pinEl && pinEl.getBoundingClientRect().height) || window.innerHeight;
+  }
+
   /* ---- Reveal-on-view ---- */
   var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
   if ('IntersectionObserver' in window && revealEls.length) {
@@ -201,10 +209,11 @@
   /* ---- Horizontal scroll gallery ---- */
   var hscrollSection = document.getElementById('hscrollSection');
   var hscrollTrack = document.getElementById('hscrollTrack');
+  var hscrollPinEl = hscrollSection ? hscrollSection.querySelector('.hscroll-pin') : null;
   function updateHscroll() {
     if (!hscrollSection || !hscrollTrack) return;
     var rect = hscrollSection.getBoundingClientRect();
-    var total = hscrollSection.offsetHeight - window.innerHeight;
+    var total = hscrollSection.offsetHeight - pinHeight(hscrollPinEl);
     if (total <= 0) return;
     var progress = Math.max(0, Math.min(1, -rect.top / total));
     var maxScroll = Math.max(0, hscrollTrack.scrollWidth - hscrollSection.clientWidth);
@@ -218,10 +227,11 @@
   var scrollyProgressLine = document.getElementById('scrollyProgressLine');
   var SCROLLY_STEP_COUNT = scrollySteps.length || 3;
   var lastActiveStep = -1;
+  var scrollyPinEl = scrollySection ? scrollySection.querySelector('.scrolly-pin') : null;
   function updateScrolly() {
     if (!scrollySection) return;
     var rect = scrollySection.getBoundingClientRect();
-    var total = scrollySection.offsetHeight - window.innerHeight;
+    var total = scrollySection.offsetHeight - pinHeight(scrollyPinEl);
     if (total <= 0) return;
     var scrolled = -rect.top;
     var progress = Math.min(1, Math.max(0, scrolled / total));
@@ -314,10 +324,11 @@
     }
   }
   drawPipeline(0);
+  var cinemaPinEl = cinemaSection ? cinemaSection.querySelector('.cinema-pin') : null;
   function updateCinema() {
     if (!cinemaSection || !ctx) return;
     var rect = cinemaSection.getBoundingClientRect();
-    var total = cinemaSection.offsetHeight - window.innerHeight;
+    var total = cinemaSection.offsetHeight - pinHeight(cinemaPinEl);
     if (total <= 0) return;
     var progress = clamp01(-rect.top / total);
     drawPipeline(progress);
@@ -390,10 +401,11 @@
     three = { render: render3d };
     render3d(0);
   }
+  var scene3dPinEl = scene3dSection ? scene3dSection.querySelector('.scene3d-pin') : null;
   function updateScene3d() {
     if (!scene3dSection || !three) return;
     var rect = scene3dSection.getBoundingClientRect();
-    var total = scene3dSection.offsetHeight - window.innerHeight;
+    var total = scene3dSection.offsetHeight - pinHeight(scene3dPinEl);
     if (total <= 0) return;
     var progress = Math.max(0, Math.min(1, -rect.top / total));
     three.render(progress);
