@@ -19,6 +19,12 @@
    fully over these images no matter what opacity/blend-mode
    was set here. Bumped to 2 so this layer wins outright,
    regardless of DOM order.
+
+   UPDATE: .img-par-front (the icon layer: chat bubble, gear,
+   mic, calendar) disabled via display:none below — it was
+   overpowering the 3D orb spheres once it became visible.
+   Back + mid layers left active (they read as background
+   depth/texture, not competing focal shapes).
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -45,10 +51,10 @@
     opacity:0.55;
 }
 .img-par-front{
-    background-image:url("../assets/parallax/layer-front.png");
-    /* Lowest of the three — this is the layer whose icons sit
-       closest to where your orb spheres already are, so keeping
-       it more subtle avoids visual clutter even though screen
-       blend can't literally hide anything underneath it. */
-    opacity:0.35;
+    /* Hidden — this was the icon layer (chat bubble, gear, mic,
+       calendar) that was overpowering the 3D orb spheres once
+       the z-index fix made this layer visible. Back + mid stay
+       on since those read as background depth/texture rather
+       than competing focal shapes. */
+    display:none;
 }
