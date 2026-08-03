@@ -1,27 +1,35 @@
 // =========================================
 // Tracks mouse position and scroll progress,
-// smoothed with simple lerping, so the render
+// smoothed with time-based exponential easing, so the render
 // loop can drive multi-layer parallax without
 // every layer reading raw/jittery input.
 // =========================================
 
-const MOUSE_EASE = 0.06;
-const SCROLL_EASE = 0.08;
+// Time constants (seconds) — how long it takes the eased value to
+// close ~95% of the gap to its target. Using a time constant instead
+// of a flat per-frame multiplier keeps this consistent across frame
+// rates (60Hz, 120Hz, throttled tabs, etc).
+const MOUSE_TAU = 0.12;
+const SCROLL_TAU = 0.12;
 
 // The hero-scroll-wrapper is taller than 100vh specifically to give
 // scroll room for the parallax to play out while the hero stays
 // pinned (position:sticky). But position:sticky releases the hero
 // the instant raw scroll passes that height — immediately, with no
-// easing — while the parallax values below are smoothed with lerp
-// and take a few frames to catch up. On a fast scroll that mismatch
-// is visible: the page starts moving before the clouds/images finish
-// drifting.
+// easing — while the parallax values below are smoothed. On a fast
+// scroll (trackpad flick, hard mouse-wheel flick) that mismatch is
+// visible: sticky lets go before the eased values finish settling,
+// and you land on the section below mid-animation.
 //
-// Fix: only use the first ANIMATION_PORTION of the scrollable range
-// to drive progress 0 -> 1. The remaining tail is a dead buffer where
-// progress just sits at 1 — plenty of real scroll distance for the
-// eased values to fully settle before the hero actually unpins.
-const ANIMATION_PORTION = 0.7;
+// Fix has two parts:
+// 1) Only use the first ANIMATION_PORTION of the scrollable range to
+//    drive progress 0 -> 1. The remaining tail is a dead buffer where
+//    progress just sits at 1 — real scroll distance for the eased
+//    values to settle before the hero actually unpins.
+// 2) Ease by elapsed time (SCROLL_TAU) rather than a fixed per-frame
+//    factor, so the eased value reliably catches up within a fixed
+//    real-world time budget no matter how fast the raw scroll moves.
+const ANIMATION_PORTION = 0.55;
 
 export function createParallax({ wrapperEl } = {}) {
 
@@ -84,12 +92,18 @@ export function createParallax({ wrapperEl } = {}) {
 
     onScroll();
 
-    function update() {
+    // dt = seconds since last frame (pass clock.getDelta() in from the
+    // render loop). Falls back to a 60fps assumption if omitted so this
+    // still behaves sanely if called without an argument.
+    function update(dt = 1 / 60) {
 
-        state.mouseX += (state.targetMouseX - state.mouseX) * MOUSE_EASE;
-        state.mouseY += (state.targetMouseY - state.mouseY) * MOUSE_EASE;
+        const mouseFactor = 1 - Math.exp(-dt / MOUSE_TAU);
+        const scrollFactor = 1 - Math.exp(-dt / SCROLL_TAU);
 
-        state.scroll += (state.targetScroll - state.scroll) * SCROLL_EASE;
+        state.mouseX += (state.targetMouseX - state.mouseX) * mouseFactor;
+        state.mouseY += (state.targetMouseY - state.mouseY) * mouseFactor;
+
+        state.scroll += (state.targetScroll - state.scroll) * scrollFactor;
 
         return state;
 
