@@ -20,16 +20,18 @@
    was set here. Bumped to 2 so this layer wins outright,
    regardless of DOM order.
 
-   UPDATE: whole .image-parallax-layer disabled via display:none
-   below. Once visible (after the z-index fix), even with the
-   front icon layer removed, .img-par-back and .img-par-mid were
-   still sitting above the canvas with mix-blend-mode:screen and
-   washing out the 3D orb spheres' contrast/definition — both
-   are similarly-themed network/dot imagery, so instead of
-   reading as separate background depth they flattened into the
-   spheres and made them look hazy. .atmosphere-layer (the soft
-   nebula clouds) is untouched and still provides background
-   depth on its own.
+   UPDATE: .img-par-front (icon layer) stays disabled — it
+   visually competed with the orb spheres as a distinct shape.
+   .img-par-back and .img-par-mid stay ON (nebula wisps + node
+   network, both corner-clustered images with mostly black
+   elsewhere), but opacity dropped hard (0.4/0.55 -> 0.16/0.2).
+   Even though screen-blend math means pure-black pixels
+   contribute nothing regardless of opacity, these source images
+   have soft glowing edges bleeding a fair way in from each
+   corner — at the old opacity that bleed was enough to flatten
+   the spheres' contrast in the middle of the hero. Turning
+   opacity down keeps the corner glow/detail visible while
+   letting it stay clearly secondary to the spheres.
 =========================================================== */
 .image-parallax-layer{
     position:absolute;
@@ -37,7 +39,6 @@
     z-index:2;
     overflow:hidden;
     pointer-events:none;
-    display:none;
 }
 .img-par{
     position:absolute;
@@ -50,11 +51,11 @@
 }
 .img-par-back{
     background-image:url("../assets/parallax/layer-back.png");
-    opacity:0.4;
+    opacity:0.16;
 }
 .img-par-mid{
     background-image:url("../assets/parallax/layer-mid.png");
-    opacity:0.55;
+    opacity:0.2;
 }
 .img-par-front{
     /* Hidden — this was the icon layer (chat bubble, gear, mic,
