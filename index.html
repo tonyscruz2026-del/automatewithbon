@@ -29,6 +29,8 @@
         href="./css/heroImageParallax.css?v=2"
     >
 
+    <link rel="stylesheet" href="./css/sections.css">
+
 </head>
 
 <body>
@@ -145,16 +147,599 @@
     </div>
 
     <!-- ======================================
-         NEXT SECTION — swap for real content.
-         This just gives the page room to scroll
-         so the hero's parallax has somewhere to go.
+         PORTFOLIO SECTIONS
+         (ported from sections.html — see that file's
+         [PLACEHOLDER] markers before pushing live)
     ======================================= -->
 
-    <section class="next-section-placeholder">
+    <div id="scrollProgressBar"></div>
+    <div id="noiseOverlay"></div>
 
-        <p>Your next section goes here.</p>
+    <div class="pf-section">
 
-    </section>
+      <!-- ============ MARQUEE — tool stack ============ -->
+      <section class="marquee-section">
+        <p class="marquee-label">Built with the tools you already run on</p>
+        <div class="marquee-viewport">
+          <div class="marquee-track">
+            <span>Make.com</span>
+            <span>GoHighLevel</span>
+            <span>Zapier</span>
+            <span>Activepieces</span>
+            <span>Google Workspace</span>
+            <span>Meta Messenger API</span>
+            <span>Groq / Gemini</span>
+            <span>n8n</span>
+            <span>Make.com</span>
+            <span>GoHighLevel</span>
+            <span>Zapier</span>
+            <span>Activepieces</span>
+            <span>Google Workspace</span>
+            <span>Meta Messenger API</span>
+            <span>Groq / Gemini</span>
+            <span>n8n</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SHADER MESH BACKGROUND + TYPEWRITER ============ -->
+      <section class="shader-section">
+        <canvas id="shaderCanvas"></canvas>
+        <div class="shader-content">
+          <span class="pf-eyebrow">Real-time WebGL</span>
+          <h2 class="typewriter-text"><span id="typewriterText"></span><span class="typewriter-cursor"></span></h2>
+        </div>
+      </section>
+
+      <!-- ============ FEATURES ============ -->
+      <section class="features">
+        <div class="features-grid">
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#EAF2FB" stroke-width="1.5">
+                <circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/>
+                <path d="M8 7l3 9M16 7l-3 9"/>
+              </svg>
+            </div>
+            <h3>Workflow Automation</h3>
+            <p>Automate tasks and processes end-to-end, no more manual re-entry or copy-paste busywork.</p>
+          </div>
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#EAF2FB" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+              </svg>
+            </div>
+            <h3>Seamless Integrations</h3>
+            <p>Connect your CRM, forms, and inbox so they all work as one system, not separate silos.</p>
+          </div>
+          <div class="feature-card reveal">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#EAF2FB" stroke-width="1.5">
+                <path d="M3 20V10M9 20V4M15 20v-8M21 20V7"/>
+              </svg>
+            </div>
+            <h3>Scale &amp; Optimize</h3>
+            <p>Systems built to handle more volume without more manual effort as your business grows.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ BENTO GRID — capabilities ============ -->
+      <section class="bento-section reveal" id="bentoSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">What's inside</span>
+          <h2 id="bentoHeading">Capabilities</h2>
+        </div>
+        <div class="bento-grid" style="perspective: 1000px;">
+          <div class="bento-card tilt-card b-large b-accent">
+            <h4>Lead qualification agents</h4>
+            <p>Messenger and live-chat agents that check intent and route automatically, no human triage needed.</p>
+          </div>
+          <div class="bento-card tilt-card">
+            <h4>CRM booking</h4>
+            <p>Capacity-enforced scheduling with branching success/fail logic.</p>
+          </div>
+          <div class="bento-card tilt-card b-tall">
+            <h4>Review routing</h4>
+            <p>Responses suggested automatically, routed by sentiment before they ever reach a human.</p>
+          </div>
+          <div class="bento-card tilt-card b-wide">
+            <h4>Email sequences</h4>
+            <p>Confirmation, reminder, review request, and retention follow-up, sent on their own schedule.</p>
+          </div>
+          <div class="bento-card tilt-card">
+            <h4>Reporting</h4>
+            <p>Dashboards that track what the automations are actually doing.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCROLLYTELLING — how it works ============ -->
+      <section class="scrolly" id="scrollySection">
+        <div class="scrolly-pin">
+          <span class="pf-eyebrow">How It Works</span>
+          <div class="scrolly-track-wrap">
+            <svg viewBox="0 0 760 120" fill="none">
+              <line x1="80" y1="60" x2="680" y2="60" stroke="rgba(45,125,255,0.15)" stroke-width="3"/>
+              <line id="scrollyProgressLine" x1="80" y1="60" x2="80" y2="60" stroke="var(--accent)" stroke-width="3"/>
+              <g class="scrolly-node" data-step="0">
+                <circle class="scrolly-node-bg" cx="80" cy="60" r="26"/>
+                <path class="scrolly-node-icon" d="M68,54 h24 M68,60 h24 M68,66 h16"/>
+              </g>
+              <g class="scrolly-node" data-step="1">
+                <circle class="scrolly-node-bg" cx="380" cy="60" r="26"/>
+                <path class="scrolly-node-icon" d="M368,60 l8,8 16,-16"/>
+              </g>
+              <g class="scrolly-node" data-step="2">
+                <circle class="scrolly-node-bg" cx="680" cy="60" r="26"/>
+                <path class="scrolly-node-icon" d="M668,52 a12,12 0 1,1 0,16 M676,60 l4,4 6,-8"/>
+              </g>
+            </svg>
+          </div>
+          <div class="scrolly-text">
+            <div class="scrolly-step" data-step="0">
+              <span class="tag">Step 1</span>
+              <h3>A request comes in</h3>
+              <p>A customer message, form submission, or booking request lands, no matter which channel it arrives from.</p>
+            </div>
+            <div class="scrolly-step" data-step="1">
+              <span class="tag">Step 2</span>
+              <h3>The system checks and routes it</h3>
+              <p>Availability, rules, and conditions are checked automatically, then the request is routed to the right workflow.</p>
+            </div>
+            <div class="scrolly-step" data-step="2">
+              <span class="tag">Step 3</span>
+              <h3>Confirmation goes out</h3>
+              <p>The customer gets an instant confirmation, and it's logged, with zero manual follow-up.</p>
+            </div>
+          </div>
+          <span class="scrolly-progress-hint">Keep scrolling to see each step ↓</span>
+        </div>
+      </section>
+
+      <!-- ============ HORIZONTAL SCROLL GALLERY — projects ============ -->
+      <section class="hscroll-section" id="hscrollSection">
+        <div class="hscroll-pin">
+          <div class="hscroll-header">
+            <span class="pf-eyebrow">Projects</span>
+            <h2>Keep scrolling — this row moves sideways</h2>
+          </div>
+          <div class="hscroll-track" id="hscrollTrack">
+            <div class="hscroll-card"><span class="num">01</span><h4>Messenger Lead Agent</h4><p>Make.com + Groq, qualifying leads straight in chat.</p></div>
+            <div class="hscroll-card"><span class="num">02</span><h4>Live Lead Agent</h4><p>Cloudflare Workers + Apps Script, real-time qualification.</p></div>
+            <div class="hscroll-card"><span class="num">03</span><h4>Activepieces Chatbot</h4><p>Cross-platform rebuild for fluency across tools.</p></div>
+            <div class="hscroll-card"><span class="num">04</span><h4>GHL Reservation System</h4><p>Capacity-enforced booking with branching logic.</p></div>
+            <div class="hscroll-card"><span class="num">05</span><h4>Job-Search Agent</h4><p>Python + GitHub Actions, running its own search loop.</p></div>
+            <div class="hscroll-card"><span class="num">06</span><h4>Content Pipeline</h4><p>Publishing automation from draft to post.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STATS — [PLACEHOLDER NUMBERS, replace before publishing] ============ -->
+      <section class="stats-section">
+        <svg class="draw-divider" viewBox="0 0 900 60" fill="none">
+          <path id="dividerPath" class="draw-path" d="M10,30 C150,5 250,55 400,30 C550,5 650,55 890,30" />
+        </svg>
+        <h2 class="split-heading" id="statsHeading">Numbers that back it up</h2>
+        <div class="stats-grid">
+          <div class="stat-card reveal"><div class="stat-number" data-count-to="8" data-suffix="+">0</div><div class="stat-label">Automation projects shipped</div></div>
+          <div class="stat-card reveal"><div class="stat-number" data-count-to="4" data-suffix="">0</div><div class="stat-label">Platforms mastered [PLACEHOLDER]</div></div>
+          <div class="stat-card reveal"><div class="stat-number" data-count-to="26" data-suffix="">0</div><div class="stat-label">Portfolio pages</div></div>
+          <div class="stat-card reveal"><div class="stat-number" data-count-to="0" data-suffix="hrs">0</div><div class="stat-label">[PLACEHOLDER — e.g. hours saved for a client]</div></div>
+        </div>
+      </section>
+
+      <!-- ============ PARTICLE NETWORK ============ -->
+      <section class="particle-section" id="particleSection">
+        <canvas id="particleCanvas"></canvas>
+        <div class="particle-caption">
+          <span class="pf-eyebrow">Nodes, always connecting</span>
+          <h2>Every integration, quietly talking to every other</h2>
+        </div>
+      </section>
+
+      <!-- ============ SKELETON SHIMMER DEMO ============ -->
+      <section class="bento-section" style="padding-top: 0;">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Live example</span>
+          <h2>What a loading state should feel like</h2>
+        </div>
+        <div class="bento-grid" id="skeletonGrid" style="grid-auto-rows: 110px;">
+          <div class="bento-card skeleton b-wide"></div>
+          <div class="bento-card skeleton"></div>
+          <div class="bento-card skeleton"></div>
+          <div class="bento-card skeleton b-wide"></div>
+        </div>
+      </section>
+
+      <!-- ============ DRAG-TO-PAN AUTOMATION MAP ============ -->
+      <section class="bento-section" style="padding-top: 0;">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Drag to explore</span>
+          <h2 class="mask-wipe" id="maskWipeHeading">Your automation map, click-and-drag</h2>
+        </div>
+        <div class="pan-wrap" id="panWrap">
+          <canvas id="panCanvas" width="1600" height="700"></canvas>
+          <span class="pan-hint">Click and drag</span>
+        </div>
+      </section>
+
+      <!-- ============ CINEMATIC SCROLL PIPELINE ============ -->
+      <section class="cinema-scrolly" id="cinemaSection">
+        <div class="cinema-pin">
+          <canvas id="pipelineCanvas"></canvas>
+          <div class="cinema-caption">
+            <span class="tag">Behind the scenes</span>
+            <h3 id="cinemaCaptionText">Your pipeline assembles itself</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ REAL 3D SCROLL SCENE ============ -->
+      <section class="scene3d-scroll" id="scene3dSection">
+        <div class="scene3d-pin">
+          <div id="threeContainer"></div>
+          <div class="cinema-caption">
+            <span class="tag">Real 3D — WebGL</span>
+            <h3 id="scene3dCaptionText">This one's actual geometry, lit and rendered live</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TESTIMONIAL — [PLACEHOLDER, replace with a real client quote] ============ -->
+      <section class="testimonial-section">
+        <div class="testimonial reveal">
+          <div class="testi-avatar">?</div>
+          <div>
+            <p class="testi-quote">"[PLACEHOLDER — real client quote goes here]"</p>
+            <p class="testi-name">[Client name]</p>
+            <p class="testi-role">[Client role, company]</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCROLL-SNAP CAROUSEL — [PLACEHOLDER, replace all 4] ============ -->
+      <section class="carousel-section">
+        <div class="carousel-header">
+          <span class="pf-eyebrow">More results</span>
+          <h2>Swipe through client feedback</h2>
+        </div>
+        <div class="carousel-viewport" id="carouselViewport">
+          <div class="carousel-slide"><p class="testi-quote">"[PLACEHOLDER quote 1]"</p><p class="testi-name">[Name]</p><p class="testi-role">[Role, company]</p></div>
+          <div class="carousel-slide"><p class="testi-quote">"[PLACEHOLDER quote 2]"</p><p class="testi-name">[Name]</p><p class="testi-role">[Role, company]</p></div>
+          <div class="carousel-slide"><p class="testi-quote">"[PLACEHOLDER quote 3]"</p><p class="testi-name">[Name]</p><p class="testi-role">[Role, company]</p></div>
+          <div class="carousel-slide"><p class="testi-quote">"[PLACEHOLDER quote 4]"</p><p class="testi-name">[Name]</p><p class="testi-role">[Role, company]</p></div>
+        </div>
+        <div class="carousel-controls">
+          <button class="carousel-arrow" id="carouselPrev" type="button" aria-label="Previous">‹</button>
+          <button class="carousel-dot is-active" data-index="0" aria-label="Slide 1"></button>
+          <button class="carousel-dot" data-index="1" aria-label="Slide 2"></button>
+          <button class="carousel-dot" data-index="2" aria-label="Slide 3"></button>
+          <button class="carousel-dot" data-index="3" aria-label="Slide 4"></button>
+          <button class="carousel-arrow" id="carouselNext" type="button" aria-label="Next">›</button>
+        </div>
+      </section>
+
+      <!-- ============ WORD ROTATOR ============ -->
+      <section class="rotator-section reveal" id="rotatorSection">
+        <p class="rotator-line">Handles your <span class="rotator-window" id="rotatorWindow"></span> automatically.</p>
+      </section>
+
+      <!-- ============ FAQ ACCORDION ============ -->
+      <section class="faq-section" id="faqSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Questions</span>
+          <h2>Frequently asked</h2>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button"><span>Do I need to already use Make or Zapier?</span><span class="faq-icon"></span></button>
+          <div class="faq-answer"><p>No. Builds are wired around whichever tools you already run on, Make, Zapier, GoHighLevel, or plain Google Workspace.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button"><span>How long does setup take?</span><span class="faq-icon"></span></button>
+          <div class="faq-answer"><p>Most single-workflow builds, like a booking agent or a lead qualifier, are live within a week once requirements are locked in.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button"><span>What happens if something breaks?</span><span class="faq-icon"></span></button>
+          <div class="faq-answer"><p>Every workflow ships with logging and error-routing, so failures get flagged and surfaced instead of silently dropping a customer.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button"><span>Can this replace a full-time coordinator?</span><span class="faq-icon"></span></button>
+          <div class="faq-answer"><p>For repetitive intake, routing, and confirmation work, yes. For judgment calls, it hands off to a human instead of guessing.</p></div>
+        </div>
+      </section>
+
+      <!-- ============ TABS — stack ============ -->
+      <section class="tabs-section" id="tabsSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Pick your stack</span>
+          <h2>Built for the tools you use</h2>
+        </div>
+        <div class="tabs-nav" role="tablist">
+          <button class="tab-btn is-active" data-tab="make" type="button">Make.com</button>
+          <button class="tab-btn" data-tab="ghl" type="button">GoHighLevel</button>
+          <button class="tab-btn" data-tab="ap" type="button">Activepieces</button>
+        </div>
+        <div class="tab-panel is-active" data-tab-panel="make">
+          <h4>Make.com</h4>
+          <p>Visual scenario builder used for booking agents, review-routing agents, and Messenger lead qualifiers, wired to Google Sheets, Gmail, and AI models.</p>
+        </div>
+        <div class="tab-panel" data-tab-panel="ghl">
+          <h4>GoHighLevel</h4>
+          <p>Used for reservation-system builds — capacity-enforced scheduling with branching success and failure logic.</p>
+        </div>
+        <div class="tab-panel" data-tab-panel="ap">
+          <h4>Activepieces</h4>
+          <p>Open-source alternative used to rebuild agents with fast open models for language matching.</p>
+        </div>
+      </section>
+
+      <!-- ============ PRICING TOGGLE — [PLACEHOLDER, optional: delete this section if you don't sell fixed packages] ============ -->
+      <section class="pricing-section" id="pricingSection">
+        <span class="pf-eyebrow">Sample structure — not live pricing</span>
+        <h2>[PLACEHOLDER — replace with real service tiers, or remove this section]</h2>
+        <div class="pricing-toggle-wrap">
+          <span>Monthly</span>
+          <button class="pricing-switch" id="pricingSwitch" type="button" aria-label="Toggle yearly pricing"><span class="pricing-switch-knob"></span></button>
+          <span>Yearly <span style="color: var(--accent);">(save 20%)</span></span>
+        </div>
+        <div class="pricing-grid">
+          <div class="price-card"><h4>Starter</h4><div class="price-amount" data-monthly="0" data-yearly="0">$0<span>/mo</span></div><p class="price-desc">[PLACEHOLDER description]</p></div>
+          <div class="price-card is-featured"><h4>Growth</h4><div class="price-amount" data-monthly="0" data-yearly="0">$0<span>/mo</span></div><p class="price-desc">[PLACEHOLDER description]</p></div>
+          <div class="price-card"><h4>Scale</h4><div class="price-amount" data-monthly="0" data-yearly="0">$0<span>/mo</span></div><p class="price-desc">[PLACEHOLDER description]</p></div>
+        </div>
+      </section>
+
+      <!-- ============ BEFORE / AFTER COMPARISON SLIDER ============ -->
+      <section class="compare-section" id="compareSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Drag the handle</span>
+          <h2>Before automation, after automation</h2>
+        </div>
+        <div class="compare-wrap" id="compareWrap">
+          <div class="compare-before"><span class="compare-label">Before</span><p>Manual data entry, missed follow-ups, replies sent hours later.</p></div>
+          <div class="compare-after" id="compareAfter"><span class="compare-label">After</span><p>Instant routing, automatic confirmations, zero manual re-entry.</p></div>
+          <div class="compare-line" id="compareLine"></div>
+          <div class="compare-grip" id="compareGrip">⇔</div>
+        </div>
+      </section>
+
+      <!-- ============ 3D FLIP CARDS ============ -->
+      <section class="flip-section" id="flipSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Hover to flip</span>
+          <h2>A different card interaction</h2>
+        </div>
+        <div class="flip-grid">
+          <div class="flip-card" tabindex="0"><div class="flip-card-inner">
+            <div class="flip-face flip-front"><h4>Intake</h4><p>Hover to see what happens behind the scenes.</p></div>
+            <div class="flip-face flip-back"><h4>Behind it</h4><p>Every channel writes to one queue table before routing runs.</p></div>
+          </div></div>
+          <div class="flip-card" tabindex="0"><div class="flip-card-inner">
+            <div class="flip-face flip-front"><h4>Routing</h4><p>Hover to see what happens behind the scenes.</p></div>
+            <div class="flip-face flip-back"><h4>Behind it</h4><p>A rules engine checks availability and intent before assigning a workflow.</p></div>
+          </div></div>
+          <div class="flip-card" tabindex="0"><div class="flip-card-inner">
+            <div class="flip-face flip-front"><h4>Delivery</h4><p>Hover to see what happens behind the scenes.</p></div>
+            <div class="flip-face flip-back"><h4>Behind it</h4><p>Confirmation and logging happen in the same transaction, nothing silently drops.</p></div>
+          </div></div>
+        </div>
+      </section>
+
+      <!-- ============ MICRO-INTERACTIONS ============ -->
+      <section class="fx-section" id="fxSection">
+        <span class="pf-eyebrow">Micro-interactions</span>
+        <h2>Click feedback</h2>
+        <div class="fx-buttons">
+          <button class="fx-btn" id="rippleBtn" type="button">Ripple click</button>
+          <button class="fx-btn" id="confettiBtn" type="button">Confetti burst</button>
+          <button class="fx-btn" id="toastBtn" type="button">Show toast</button>
+          <button class="fx-btn" id="copyBtn" type="button" data-copy-text="[PLACEHOLDER — e.g. your email or a booking link]">Copy contact info</button>
+        </div>
+      </section>
+
+      <!-- ============ AURORA GRADIENT BACKGROUND ============ -->
+      <section class="aurora-section" id="auroraSection">
+        <div class="aurora-blob b1"></div>
+        <div class="aurora-blob b2"></div>
+        <div class="aurora-blob b3"></div>
+        <div class="aurora-content">
+          <span class="pf-eyebrow">CSS-only, no canvas</span>
+          <h2>Soft, drifting gradient blobs</h2>
+        </div>
+      </section>
+
+      <!-- ============ RATING STARS ============ -->
+      <section class="rating-section" id="ratingSection">
+        <span class="pf-eyebrow">Quick feedback</span>
+        <h2>How useful is this page as a reference?</h2>
+        <div class="rating-stars" id="ratingStars">
+          <button class="rating-star" type="button" data-value="1" aria-label="1 star"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+          <button class="rating-star" type="button" data-value="2" aria-label="2 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+          <button class="rating-star" type="button" data-value="3" aria-label="3 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+          <button class="rating-star" type="button" data-value="4" aria-label="4 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+          <button class="rating-star" type="button" data-value="5" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+        </div>
+        <p class="rating-feedback" id="ratingFeedback">Hover or tap a star</p>
+      </section>
+
+      <!-- ============ RANGE SLIDER ============ -->
+      <section class="slider-section" id="sliderSection">
+        <span class="pf-eyebrow">Rough estimate</span>
+        <h2>How many hours a week does your team lose to manual busywork?</h2>
+        <div class="slider-wrap">
+          <div class="slider-fill" id="sliderFill"></div>
+          <div class="slider-bubble" id="sliderBubble">10 hrs</div>
+          <input type="range" min="1" max="40" value="10" class="slider-input" id="hoursSlider">
+        </div>
+        <div class="slider-ticks"><span>1 hr</span><span>40 hrs</span></div>
+        <p class="slider-result">At that rate, automation could give your team back roughly <strong id="sliderResultVal">8</strong> hours a week.</p>
+      </section>
+
+      <!-- ============ CUSTOM SELECT ============ -->
+      <section class="select-section" id="selectSection">
+        <span class="pf-eyebrow">Tell us more</span>
+        <h2>What industry are you in?</h2>
+        <div class="custom-select" id="customSelect">
+          <button class="select-trigger" id="selectTrigger" type="button" aria-haspopup="listbox">
+            <span id="selectValue">Choose an industry</span><span class="chev">▾</span>
+          </button>
+          <div class="select-panel" id="selectPanel" role="listbox">
+            <div class="select-option" data-value="fitness" role="option"><span>Fitness &amp; wellness</span><span class="opt-desc">Studios, gyms, trainers</span></div>
+            <div class="select-option" data-value="hospitality" role="option"><span>Hospitality &amp; food</span><span class="opt-desc">Restaurants, bookings</span></div>
+            <div class="select-option" data-value="services" role="option"><span>Local services</span><span class="opt-desc">Salons, contractors</span></div>
+            <div class="select-option" data-value="agency" role="option"><span>Agencies &amp; consulting</span><span class="opt-desc">Client operations</span></div>
+            <div class="select-option" data-value="other" role="option"><span>Something else</span><span class="opt-desc">We'll figure it out together</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DRAG-TO-REORDER ============ -->
+      <section class="reorder-section" id="reorderSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Drag to rank</span>
+          <h2>What matters most to you first?</h2>
+        </div>
+        <div class="reorder-list" id="reorderList">
+          <div class="reorder-item" draggable="true"><span class="reorder-rank">1</span><span class="reorder-handle">⋮⋮</span><span class="item-label">Faster response times</span></div>
+          <div class="reorder-item" draggable="true"><span class="reorder-rank">2</span><span class="reorder-handle">⋮⋮</span><span class="item-label">Fewer missed bookings</span></div>
+          <div class="reorder-item" draggable="true"><span class="reorder-rank">3</span><span class="reorder-handle">⋮⋮</span><span class="item-label">Less manual data entry</span></div>
+          <div class="reorder-item" draggable="true"><span class="reorder-rank">4</span><span class="reorder-handle">⋮⋮</span><span class="item-label">Clearer reporting</span></div>
+        </div>
+      </section>
+
+      <!-- ============ LIGHTBOX ============ -->
+      <section class="lightbox-section" id="lightboxSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Click to expand</span>
+          <h2>A closer look at a few builds</h2>
+        </div>
+        <div class="lightbox-grid" id="lightboxGrid">
+          <button class="lightbox-thumb" type="button" data-title="Messenger Lead Agent" data-desc="Make.com scenario that qualifies leads in real time inside Messenger, then hands off warm leads straight to the sales inbox." style="background: linear-gradient(160deg, #1B4B7A, #0A1220);"><span class="thumb-fill">Messenger Lead Agent</span></button>
+          <button class="lightbox-thumb" type="button" data-title="GHL Reservation System" data-desc="Capacity-enforced booking flow built in GoHighLevel, with branching logic for full, partial, and available time slots." style="background: linear-gradient(160deg, #123a5c, #0A1220);"><span class="thumb-fill">GHL Reservation System</span></button>
+          <button class="lightbox-thumb" type="button" data-title="Content Pipeline" data-desc="An end-to-end publishing pipeline that moves a draft from idea to scheduled post with no manual handoffs." style="background: linear-gradient(160deg, #234a7a, #0A1220);"><span class="thumb-fill">Content Pipeline</span></button>
+        </div>
+      </section>
+
+      <div class="lightbox-overlay" id="lightboxOverlay">
+        <div class="lightbox-panel">
+          <h3 id="lightboxTitle">Title</h3>
+          <p id="lightboxDesc">Description</p>
+          <button class="lightbox-close" id="lightboxClose" type="button">Close</button>
+        </div>
+      </div>
+
+      <!-- ============ CURSOR-FOLLOW PREVIEW ============ -->
+      <section class="cfp-section" id="cfpSection">
+        <div class="bento-header">
+          <span class="pf-eyebrow">Hover a row</span>
+          <h2>A preview trails your cursor</h2>
+        </div>
+        <div class="cfp-list" id="cfpList">
+          <div class="cfp-row" data-preview="Make.com" data-color="linear-gradient(135deg,#2d7dff,#0A1220)">Make.com scenarios</div>
+          <div class="cfp-row" data-preview="GoHighLevel" data-color="linear-gradient(135deg,#8fe3ff,#0A1220)">GoHighLevel booking flows</div>
+          <div class="cfp-row" data-preview="Activepieces" data-color="linear-gradient(135deg,#2aa8ff,#0A1220)">Activepieces agents</div>
+          <div class="cfp-row" data-preview="Google Workspace" data-color="linear-gradient(135deg,#63b8ff,#0A1220)">Google Workspace automations</div>
+        </div>
+      </section>
+      <div id="cfpPreview"></div>
+
+      <!-- ============ SVG GOO ============ -->
+      <section class="goo-section" id="gooSection">
+        <span class="pf-eyebrow">SVG filter, no canvas</span>
+        <h2>Nodes that merge like liquid</h2>
+        <div class="goo-wrap">
+          <svg class="goo-canvas" viewBox="0 0 600 220">
+            <defs>
+              <filter id="gooFilter">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+              </filter>
+            </defs>
+            <g id="gooGroup">
+              <circle class="goo-blob b1" cx="180" cy="110" r="34"></circle>
+              <circle class="goo-blob b2" cx="260" cy="110" r="30"></circle>
+              <circle class="goo-blob b3" cx="340" cy="110" r="26"></circle>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ============ SOUND FEEDBACK ============ -->
+      <section class="sound-section" id="soundSection">
+        <span class="pf-eyebrow">Try it with sound on</span>
+        <h2>Interaction feedback you can hear</h2>
+        <div class="sound-pads" id="soundPads">
+          <button class="sound-pad" type="button" data-note="392">Route</button>
+          <button class="sound-pad" type="button" data-note="440">Check</button>
+          <button class="sound-pad" type="button" data-note="523">Send</button>
+          <button class="sound-pad" type="button" data-note="659">Done</button>
+        </div>
+        <p class="sound-hint">Each pad plays a short tone through the Web Audio API, unlocked on first click.</p>
+      </section>
+
+      <!-- ============ VIEW TRANSITIONS GRID/LIST ============ -->
+      <section class="vt-section" id="vtSection">
+        <div class="vt-header">
+          <div>
+            <span class="pf-eyebrow">Native browser transition</span>
+            <h2>Automation library</h2>
+          </div>
+          <div class="vt-toggle-group">
+            <button class="vt-toggle-btn is-active" id="vtGridBtn" type="button">Grid</button>
+            <button class="vt-toggle-btn" id="vtListBtn" type="button">List</button>
+          </div>
+        </div>
+        <div class="vt-grid-view" id="vtContainer">
+          <div class="vt-item"><h5>Lead Qualifier</h5></div>
+          <div class="vt-item"><h5>Booking Agent</h5></div>
+          <div class="vt-item"><h5>Review Router</h5></div>
+          <div class="vt-item"><h5>Email Sequences</h5></div>
+          <div class="vt-item"><h5>Reporting Dash</h5></div>
+          <div class="vt-item"><h5>Content Pipeline</h5></div>
+          <div class="vt-item"><h5>Job-Search Agent</h5></div>
+          <div class="vt-item"><h5>Reservation System</h5></div>
+        </div>
+      </section>
+
+      <!-- ============ FINAL CTA — cursor spotlight ============ -->
+      <section class="final-cta spotlight-section" id="consult">
+        <a href="#" class="cta-secondary magnetic" data-magnetic>Book a Free Consultation</a>
+      </section>
+
+    </div><!-- /.pf-section -->
+
+    <!-- ============ COMMAND PALETTE (add ⌘K trigger button to your nav — see below) ============ -->
+    <div class="cmdk-overlay" id="cmdkOverlay">
+      <div class="cmdk-panel">
+        <input type="text" class="cmdk-input" id="cmdkInput" placeholder="Jump to a section..." autocomplete="off">
+        <div class="cmdk-list" id="cmdkList"></div>
+      </div>
+    </div>
+    <!-- NOTE: there is currently no nav on this page to put a ⌘K trigger
+         button into. If you want one reachable by mouse (not just the
+         keyboard shortcut), add:
+         <button class="cmdk-trigger" id="cmdkTrigger" type="button">Search <kbd>⌘K</kbd></button>
+         somewhere in the page. -->
+
+    <div id="customCursor"></div>
+    <div id="customCursorRing"></div>
+
+    <nav id="scrollspyNav" aria-label="Section navigation"></nav>
+
+    <button id="backToTop" type="button" aria-label="Back to top">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20" stroke-width="3"></circle>
+        <circle class="progress" id="backToTopProgress" cx="24" cy="24" r="20" stroke-width="3" fill="none" stroke-dasharray="125.6" stroke-dashoffset="125.6"></circle>
+        <path class="arrow" d="M24 30 L24 18 M18 24 L24 18 L30 24" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+
+    <canvas id="confettiCanvas"></canvas>
+    <div class="toast-stack" id="toastStack"></div>
 
     <!-- ======================================
          FUTURE PROJECT INFO PANEL
@@ -200,6 +785,16 @@
         type="module"
         src="./js/hero3d/hero3d.js"
     ></script>
+
+    <!-- ======================================
+         SECTIONS — needs a global THREE (not the
+         ES module import above, which only exists
+         inside hero3d.js's own module scope), hence
+         the classic build here as well.
+    ======================================= -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="./js/sections.js"></script>
 
 </body>
 
