@@ -224,7 +224,7 @@
      do we unlock and let the page continue scrolling to the next
      section — guaranteeing the animation always finishes first.
   ================================================================== */
-  var SJ_DISTANCE = 1800; // px of input needed to play a section start-to-end (higher = slower)
+  var SJ_DISTANCE = 2150; // px of input needed to play a section start-to-end (higher = slower)
   var sjLocked = null;   // the controller currently holding scroll, or null
   var sjSavedScrollY = 0;
   var sjCooldownUntil = 0; // timestamp; crossing checks are skipped until this passes
@@ -520,10 +520,10 @@
 
   /* ---- Register all four sections with the scroll-jack engine ---- */
   sjControllers = [
-    createScrollJack(scrollySection, renderScrolly, { distance: 1800 }),
-    createScrollJack(hscrollSection, renderHscroll, { distance: 2200 }),
-    createScrollJack(cinemaSection, drawPipeline, { distance: 1900 }),
-    createScrollJack(scene3dSection, renderScene3d, { distance: 2200 })
+    createScrollJack(scrollySection, renderScrolly, { distance: 2150 }),
+    createScrollJack(hscrollSection, renderHscroll, { distance: 2600 }),
+    createScrollJack(cinemaSection, drawPipeline, { distance: 2250 }),
+    createScrollJack(scene3dSection, renderScene3d, { distance: 2600 })
   ].filter(Boolean);
 
   /* ---- WebGL shader mesh background ---- */
