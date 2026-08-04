@@ -206,16 +206,137 @@
     });
   }
 
+  /* ==============================================================
+     Scroll-jack engine
+     ------------------------------------------------------------
+     Problem this solves: the old approach mapped animation progress
+     straight off scrollY (progress = -rect.top / total). That means
+     one fast wheel/trackpad gesture could blow through the entire
+     scroll distance in a single input event, so the page moved on
+     before the animation had a chance to finish — "downscroll faster
+     than the animation".
+
+     Fix: when one of these sections reaches the top of the viewport,
+     we fully LOCK page scroll (position:fixed on <body>, so wheel,
+     touch, keyboard and scrollbar-drag are all blocked) and instead
+     read wheel/touch/key input ourselves to drive progress from 0->1
+     (or 1->0 scrolling back up). Only once progress hits the far end
+     do we unlock and let the page continue scrolling to the next
+     section — guaranteeing the animation always finishes first.
+  ================================================================== */
+  var SJ_DISTANCE = 650; // px of input needed to play a section start-to-end
+  var sjLocked = null;   // the controller currently holding scroll, or null
+  var sjSavedScrollY = 0;
+
+  function sjLockScroll() {
+    var scrollBarW = window.innerWidth - document.documentElement.clientWidth;
+    sjSavedScrollY = window.scrollY || window.pageYOffset;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-sjSavedScrollY) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    if (scrollBarW > 0) document.body.style.paddingRight = scrollBarW + 'px';
+  }
+  function sjUnlockScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.paddingRight = '';
+    window.scrollTo(0, sjSavedScrollY);
+  }
+
+  function createScrollJack(el, render, opts) {
+    if (!el) return null;
+    opts = opts || {};
+    var ctrl = { el: el, render: render, progress: 0, distance: opts.distance || SJ_DISTANCE, lastTop: null };
+    ctrl.render(0);
+    return ctrl;
+  }
+
+  function sjEnter(ctrl) {
+    if (sjLocked === ctrl) return;
+    var top = ctrl.el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset);
+    window.scrollTo(0, top);
+    sjLockScroll();
+    sjLocked = ctrl;
+  }
+
+  function sjExit(ctrl, leftoverDelta) {
+    sjUnlockScroll();
+    sjLocked = null;
+    if (leftoverDelta) window.scrollBy(0, leftoverDelta);
+  }
+
+  function sjHandleDelta(deltaY) {
+    var ctrl = sjLocked;
+    if (!ctrl) return;
+    var next = ctrl.progress + deltaY / ctrl.distance;
+    if (next >= 1) {
+      ctrl.progress = 1;
+      ctrl.render(1);
+      sjExit(ctrl, deltaY > 0 ? Math.min(deltaY, 60) : 0);
+      return;
+    }
+    if (next <= 0) {
+      ctrl.progress = 0;
+      ctrl.render(0);
+      sjExit(ctrl, deltaY < 0 ? Math.max(deltaY, -60) : 0);
+      return;
+    }
+    ctrl.progress = next;
+    ctrl.render(next);
+  }
+
+  window.addEventListener('wheel', function (e) {
+    if (!sjLocked) return;
+    e.preventDefault();
+    sjHandleDelta(e.deltaY);
+  }, { passive: false });
+
+  var sjTouchY = null;
+  window.addEventListener('touchstart', function (e) {
+    if (sjLocked) sjTouchY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchmove', function (e) {
+    if (!sjLocked || sjTouchY === null) return;
+    e.preventDefault();
+    var y = e.touches[0].clientY;
+    sjHandleDelta((sjTouchY - y) * 1.6);
+    sjTouchY = y;
+  }, { passive: false });
+  window.addEventListener('touchend', function () { sjTouchY = null; });
+
+  var SJ_BLOCK_KEYS = { 32: 1, 33: 1, 34: 1, 35: 1, 36: 1, 38: 1, 40: 1 };
+  window.addEventListener('keydown', function (e) {
+    if (!sjLocked || !SJ_BLOCK_KEYS[e.keyCode]) return;
+    e.preventDefault();
+    var delta = (e.keyCode === 38 || e.keyCode === 33) ? -80 : 80;
+    if (e.keyCode === 36) delta = -1000;
+    if (e.keyCode === 35) delta = 1000;
+    sjHandleDelta(delta);
+  });
+
+  var sjControllers = [];
+  function sjCheckCrossings() {
+    if (sjLocked) return;
+    for (var i = 0; i < sjControllers.length; i++) {
+      var ctrl = sjControllers[i];
+      var top = ctrl.el.getBoundingClientRect().top;
+      var prev = ctrl.lastTop;
+      ctrl.lastTop = top;
+      if (prev === null) continue;
+      var crossedDown = prev > 0 && top <= 0 && ctrl.progress < 1;
+      var crossedUp = prev < 0 && top >= 0 && ctrl.progress > 0;
+      if (crossedDown || crossedUp) { sjEnter(ctrl); break; }
+    }
+  }
+
   /* ---- Horizontal scroll gallery ---- */
   var hscrollSection = document.getElementById('hscrollSection');
   var hscrollTrack = document.getElementById('hscrollTrack');
-  var hscrollPinEl = hscrollSection ? hscrollSection.querySelector('.hscroll-pin') : null;
-  function updateHscroll() {
+  function renderHscroll(progress) {
     if (!hscrollSection || !hscrollTrack) return;
-    var rect = hscrollSection.getBoundingClientRect();
-    var total = hscrollSection.offsetHeight - pinHeight(hscrollPinEl);
-    if (total <= 0) return;
-    var progress = Math.max(0, Math.min(1, -rect.top / total));
     var maxScroll = Math.max(0, hscrollTrack.scrollWidth - hscrollSection.clientWidth);
     hscrollTrack.style.transform = 'translate3d(' + (-progress * maxScroll).toFixed(1) + 'px, 0, 0)';
   }
@@ -227,16 +348,10 @@
   var scrollyProgressLine = document.getElementById('scrollyProgressLine');
   var SCROLLY_STEP_COUNT = scrollySteps.length || 3;
   var lastActiveStep = -1;
-  var scrollyPinEl = scrollySection ? scrollySection.querySelector('.scrolly-pin') : null;
-  function updateScrolly() {
+  function renderScrolly(progress) {
     if (!scrollySection) return;
-    var rect = scrollySection.getBoundingClientRect();
-    var total = scrollySection.offsetHeight - pinHeight(scrollyPinEl);
-    if (total <= 0) return;
-    var scrolled = -rect.top;
-    var progress = Math.min(1, Math.max(0, scrolled / total));
     var stepFloat = progress * SCROLLY_STEP_COUNT;
-    var activeStep = Math.min(SCROLLY_STEP_COUNT - 1, Math.floor(stepFloat));
+    var activeStep = progress <= 0 ? 0 : Math.min(SCROLLY_STEP_COUNT - 1, Math.floor(stepFloat));
     if (activeStep !== lastActiveStep) {
       scrollySteps.forEach(function (el) { el.classList.toggle('is-active', parseInt(el.getAttribute('data-step'), 10) === activeStep); });
       scrollyNodes.forEach(function (el) { el.classList.toggle('is-active', parseInt(el.getAttribute('data-step'), 10) <= activeStep); });
@@ -324,15 +439,6 @@
     }
   }
   drawPipeline(0);
-  var cinemaPinEl = cinemaSection ? cinemaSection.querySelector('.cinema-pin') : null;
-  function updateCinema() {
-    if (!cinemaSection || !ctx) return;
-    var rect = cinemaSection.getBoundingClientRect();
-    var total = cinemaSection.offsetHeight - pinHeight(cinemaPinEl);
-    if (total <= 0) return;
-    var progress = clamp01(-rect.top / total);
-    drawPipeline(progress);
-  }
 
   /* ---- Real 3D scroll scene (Three.js) ---- */
   var scene3dSection = document.getElementById('scene3dSection');
@@ -401,15 +507,15 @@
     three = { render: render3d };
     render3d(0);
   }
-  var scene3dPinEl = scene3dSection ? scene3dSection.querySelector('.scene3d-pin') : null;
-  function updateScene3d() {
-    if (!scene3dSection || !three) return;
-    var rect = scene3dSection.getBoundingClientRect();
-    var total = scene3dSection.offsetHeight - pinHeight(scene3dPinEl);
-    if (total <= 0) return;
-    var progress = Math.max(0, Math.min(1, -rect.top / total));
-    three.render(progress);
-  }
+  function renderScene3d(progress) { if (three) three.render(progress); }
+
+  /* ---- Register all four sections with the scroll-jack engine ---- */
+  sjControllers = [
+    createScrollJack(scrollySection, renderScrolly, { distance: 700 }),
+    createScrollJack(hscrollSection, renderHscroll, { distance: 900 }),
+    createScrollJack(cinemaSection, drawPipeline, { distance: 750 }),
+    createScrollJack(scene3dSection, renderScene3d, { distance: 850 })
+  ].filter(Boolean);
 
   /* ---- WebGL shader mesh background ---- */
   function initShader() {
@@ -788,12 +894,10 @@
   }
   initScrollProgressFallback();
 
-  /* ---- Master scroll-driven tick (drives all the scroll-tied sections above) ---- */
+  /* ---- Master tick: watches for a scroll-jack section reaching the
+     top of the viewport and locks scroll into it (see engine above) ---- */
   function tick() {
-    updateScrolly();
-    updateHscroll();
-    updateCinema();
-    updateScene3d();
+    sjCheckCrossings();
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
