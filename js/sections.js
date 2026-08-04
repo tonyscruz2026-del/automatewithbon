@@ -224,9 +224,10 @@
      do we unlock and let the page continue scrolling to the next
      section — guaranteeing the animation always finishes first.
   ================================================================== */
-  var SJ_DISTANCE = 650; // px of input needed to play a section start-to-end
+  var SJ_DISTANCE = 1800; // px of input needed to play a section start-to-end (higher = slower)
   var sjLocked = null;   // the controller currently holding scroll, or null
   var sjSavedScrollY = 0;
+  var sjCooldownUntil = 0; // timestamp; crossing checks are skipped until this passes
 
   function sjLockScroll() {
     var scrollBarW = window.innerWidth - document.documentElement.clientWidth;
@@ -262,10 +263,17 @@
     sjLocked = ctrl;
   }
 
-  function sjExit(ctrl, leftoverDelta) {
+  /* dir: +1 when the section finished playing forward (scrolling down),
+     -1 when it finished playing backward (scrolling up), 0 = no release
+     nudge needed. A real nudge (not just a few px) plus a short cooldown
+     stop an immediately-adjacent section (e.g. two pinned sections back
+     to back with no content between) from re-locking on the very next
+     frame before the user actually chose to scroll into it. */
+  function sjExit(ctrl, dir) {
     sjUnlockScroll();
     sjLocked = null;
-    if (leftoverDelta) window.scrollBy(0, leftoverDelta);
+    sjCooldownUntil = Date.now() + 500;
+    if (dir) window.scrollBy(0, dir * 160);
   }
 
   function sjHandleDelta(deltaY) {
@@ -275,13 +283,13 @@
     if (next >= 1) {
       ctrl.progress = 1;
       ctrl.render(1);
-      sjExit(ctrl, deltaY > 0 ? Math.min(deltaY, 60) : 0);
+      sjExit(ctrl, deltaY > 0 ? 1 : 0);
       return;
     }
     if (next <= 0) {
       ctrl.progress = 0;
       ctrl.render(0);
-      sjExit(ctrl, deltaY < 0 ? Math.max(deltaY, -60) : 0);
+      sjExit(ctrl, deltaY < 0 ? -1 : 0);
       return;
     }
     ctrl.progress = next;
@@ -320,6 +328,7 @@
   var sjControllers = [];
   function sjCheckCrossings() {
     if (sjLocked) return;
+    if (Date.now() < sjCooldownUntil) return;
     for (var i = 0; i < sjControllers.length; i++) {
       var ctrl = sjControllers[i];
       var top = ctrl.el.getBoundingClientRect().top;
@@ -511,10 +520,10 @@
 
   /* ---- Register all four sections with the scroll-jack engine ---- */
   sjControllers = [
-    createScrollJack(scrollySection, renderScrolly, { distance: 700 }),
-    createScrollJack(hscrollSection, renderHscroll, { distance: 900 }),
-    createScrollJack(cinemaSection, drawPipeline, { distance: 750 }),
-    createScrollJack(scene3dSection, renderScene3d, { distance: 850 })
+    createScrollJack(scrollySection, renderScrolly, { distance: 1800 }),
+    createScrollJack(hscrollSection, renderHscroll, { distance: 2200 }),
+    createScrollJack(cinemaSection, drawPipeline, { distance: 1900 }),
+    createScrollJack(scene3dSection, renderScene3d, { distance: 2200 })
   ].filter(Boolean);
 
   /* ---- WebGL shader mesh background ---- */
